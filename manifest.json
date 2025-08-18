@@ -1,20 +1,21 @@
 {
-  "name": "Aetherion Multi LLM",
-  "short_name": "Aetherion",
+  "name": "Aetherion Multi LLm",
+  "short_name": "Atherion",
   "start_url": "/aetherion_chat",
   "display": "standalone",
   "background_color": "#C8A2C8",
   "theme_color": "#000000",
+  "description": "A simple HTML app from for character building",
   "icons": [
     {
-      "src": "icon.jpeg",
+      "src": "anrgy dragon.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png"
     },
     {
-      "src": "icon.jpeg",
+      "src": "anrgy dragon.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ]
 }
