@@ -2,6 +2,7 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
+    <!-- FIX: Ensured user-scalable=no to prevent zooming which can interfere with layout -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Multi-Model AI Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,19 +21,26 @@
             --text-dark: #1a1a1a;
             --hover-dark: #3D3D3D;
         }
-        html, body {
-            height: 100%;
-            overflow: hidden;
+        
+        /* FIX: Removed fixed height and overflow from html/body to allow the browser to handle viewport resizing correctly, especially with the mobile keyboard. */
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-light);
         }
-        .dark { background-color: var(--background-dark); color: var(--text-light); }
 
         /* FIX: Added min-width: 0 to prevent flex item from overflowing its container */
-        .chat-bubble { max-width: 85%; word-wrap: break-word; overflow: hidden; min-width: 0; }
+        .chat-bubble { max-width: 85%; word-wrap: break-word; overflow-wrap: break-word; min-width: 0; }
         .chat-bubble pre { border-radius: 0.5rem; white-space: pre-wrap; word-wrap: break-word; }
 
         #search-input { margin-bottom: 10px; }
+        #search-input-container .pl-10{
+            padding-left: .9rem;
+        }
         
+        /* FIX: Added display: block and max-width: 100% to the table wrapper. This ensures it behaves correctly within the flexbox context of the chat bubble and can't grow wider than its parent, allowing overflow-x to work as intended. */
         .chat-bubble .table-wrapper {
+            display: block;
+            max-width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             border-radius: 0.5rem;
@@ -78,7 +86,7 @@
         #chat-input:focus { outline: none; box-shadow: none; }
 
         #header-new-chat-btn-desktop, #header-new-chat-btn-mobile {
-            transition: background-color 0.1s ease, transform 0.1s ease; height: 40px;
+            transition: background-color 0.1s ease, transform 0.1s ease; height: 40px; background-color: #C8A2C8; color: black;
         }
         #header-new-chat-btn-desktop:active, #header-new-chat-btn-mobile:active {
             background-color: var(--primary-accent);
@@ -137,7 +145,7 @@
             #memories-modal-header h2 { font-size: 1.25rem; }
             #memories-modal-header #add-memory-btn { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
             
-            #header-menu-btn, #main-header .absolute.right-4 { position: static; transform: none; }
+            #header-menu-btn, #main-header .absolute.right-4 { position: static; transform: none; background-color: #C8A2C8; color: #0D0D0D; }
             #main-header { gap: 0.5rem; }
             #main-header .flex-1.text-center { display: flex; flex-direction: column; align-items: center; min-width: 0; }
             #mobile-header-title-container { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
@@ -146,7 +154,8 @@
         }
     </style>
 </head>
-<body class="flex h-screen font-sans overflow-hidden bg-[var(--background-dark)]">
+<!-- FIX: Removed flex, h-screen, and overflow-hidden from body. The main app container (#app) now controls the height. -->
+<body class="font-sans">
 
     <!-- Login Overlay -->
     <div id="login-overlay" class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center z-50">
@@ -182,7 +191,8 @@
     </div>
 
     <!-- Main App Container (Initially Hidden) -->
-    <div id="app" class="flex w-full h-full relative hidden">
+    <!-- FIX: Set height to h-screen here. This makes the app container fill the viewport, providing a stable context for the keyboard to appear over. -->
+    <div id="app" class="flex w-full h-screen relative hidden">
         <div id="sidebar-backdrop" class="hidden"></div>
         <div id="conversations-container" class="h-full flex flex-col shadow-lg">
             <aside id="conversations-panel" class="h-full flex flex-col p-2 space-y-2">
@@ -193,9 +203,6 @@
                     <span id="username" class="font-bold text-lg truncate sidebar-text"></span>
                 </div>
                 <div id="search-input-container" class="relative flex items-center">
-                     <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
                     <input id="search-input" type="text" placeholder="Search..." class="w-full bg-[var(--surface-light)] rounded-md py-2 pl-10 pr-4 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">
                 </div>
                 <div class="flex-grow overflow-y-auto px-1">
@@ -214,8 +221,9 @@
             </aside>
         </div>
 
-        <main class="flex-1 flex flex-col bg-[var(--background-dark)] min-h-0">
-            <header id="main-header" class="relative flex items-center justify-between p-4 border-b border-[var(--surface-dark)]">
+        <!-- FIX: Replaced min-h-0 with overflow-hidden. This creates a stable flex container where the chat window can grow/shrink without affecting the whole page. -->
+        <main class="flex-1 flex flex-col bg-[var(--background-dark)] overflow-hidden">
+            <header id="main-header" class="relative flex items-center justify-between p-4 border-b border-[var(--surface-dark)] flex-shrink-0">
                 <button id="header-menu-btn" title="Menu" class="p-2 rounded-md hover:bg-[var(--hover-dark)] md:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
@@ -257,17 +265,18 @@
                         <div id="model-selector-dropdown-mobile" class="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-10"></div>
                     </div>
                 </div>
-                <!-- FIX: Updated mobile new chat button style -->
                 <div class="md:hidden">
                      <button id="header-new-chat-btn-mobile" title="New Chat" class="flex items-center justify-center bg-[var(--surface-dark)] w-10 h-10 rounded-md hover:bg-[var(--hover-dark)]">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                     </button>
                 </div>
             </header>
 
+            <!-- This div will grow and shrink, and its content will scroll -->
             <div id="chat-window" class="flex-1 p-4 overflow-y-auto"></div>
 
-            <footer class="p-4">
+            <!-- This footer will be pushed to the bottom by the chat-window above it -->
+            <footer class="p-4 flex-shrink-0">
                 <div class="flex items-end bg-[var(--surface-dark)] rounded-[25px] p-2">
                     <textarea id="chat-input" class="flex-1 bg-transparent p-2 text-white resize-none focus:ring-0 overflow-y-auto" placeholder="Type a message..." rows="1"></textarea>
                     <button id="send-btn" class="bg-[var(--primary-accent)] hover:opacity-80 text-black font-bold p-2 rounded-full ml-2 flex-shrink-0">
@@ -279,6 +288,8 @@
     </div>
 
     <script>
+        // The Javascript logic remains the same as it was already well-structured.
+        // The fixes are primarily in the CSS and HTML structure to handle layout.
         document.addEventListener('DOMContentLoaded', () => {
             let state = {
                 conversations: {},
@@ -289,18 +300,18 @@
 
             const models = {
                 "Flash": [
-                    { id: 'openrouter:openai/gpt-4o-mini', name: 'GPT-4o Mini', logo: 'https://placehold.co/20x20/10A37F/FFFFFF?text=O' },
-                    { id: 'openrouter:google/gemini-2.5-flash', name: 'Gemini 2.5 Flash', logo: 'https://placehold.co/20x20/4285F4/FFFFFF?text=G' },
-                    { id: 'openrouter:anthropic/claude-sonnet-4', name: 'Claude Sonnet', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=C' },
-                    { id: 'x-ai/grok-3-mini', name: 'Grok 3 mini', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=X' },
-                    { id: 'openrouter:openai/gpt-4o-mini-search-preview', name: 'GPT-4o Mini search', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=O' },
+                    { id: 'openrouter:openai/gpt-4o-mini', name: 'GPT-4o Mini', logo: 'https://i.pinimg.com/736x/67/a5/96/67a596df5a89ca51c948d0a4a8eea310.jpg' },
+                    { id: 'openrouter:google/gemini-2.5-flash', name: 'Gemini 2.5 Flash', logo: 'https://i.pinimg.com/736x/08/d6/8d/08d68db04c1a718bec70a5eb79fe61bc.jpg' },
+                    { id: 'openrouter:anthropic/claude-sonnet-4', name: 'Claude Sonnet', logo: 'https://i.pinimg.com/736x/1e/23/10/1e2310984ae6ceba64b0c21925a35813.jpg' },
+                    { id: 'x-ai/grok-3-mini', name: 'Grok 3 mini', logo: 'https://i.pinimg.com/736x/9e/0f/38/9e0f389dac42629515b009524ed47ed7.jpg' },
+                    { id: 'openrouter:openai/gpt-4o-mini-search-preview', name: 'GPT-4o Mini search', logo: 'https://i.pinimg.com/736x/67/a5/96/67a596df5a89ca51c948d0a4a8eea310.jpg' },
                 ],
                 "Deep Think": [
-                    { id: 'gpt-5', name: 'GPT 5', logo: 'https://placehold.co/20x20/10A37F/FFFFFF?text=O' },
-                    { id: 'openrouter:anthropic/claude opus 4', name: 'Claude Opus 4', logo: 'https://placehold.co/20x20/D97706/FFFFFF?text=C' },
-                    { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 pro', logo: 'https://placehold.co/20x20/4285F4/FFFFFF?text=G' },
-                    { id: 'x-ai/grok-4', name: 'Grok 4', logo: 'https://placehold.co/20x20/000000/FFFFFF?text=X' },
-                    { id: 'openrouter:deepseek/deepseek r1', name: 'Deepseek-r1', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=D' },
+                    { id: 'gpt-5', name: 'GPT-5', logo: 'https://i.pinimg.com/736x/67/a5/96/67a596df5a89ca51c948d0a4a8eea310.jpg' },
+                    { id: 'openrouter:anthropic/claude opus 4', name: 'Claude Opus 4', logo: 'https://i.pinimg.com/736x/1e/23/10/1e2310984ae6ceba64b0c21925a35813.jpg' },
+                    { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 pro', logo: 'https://i.pinimg.com/736x/08/d6/8d/08d68db04c1a718bec70a5eb79fe61bc.jpg' },
+                    { id: 'x-ai/grok-4', name: 'Grok 4', logo: 'https://i.pinimg.com/736x/9e/0f/38/9e0f389dac42629515b009524ed47ed7.jpg' },
+                    { id: 'openrouter:deepseek/deepseek r1', name: 'Deepseek-r1', logo: 'https://www.iconpacks.net/icons/free-icons-7/free-icon-deepseek-black-white-square-symbol-logo-25664.png' },
                 ]
             };
 
@@ -419,7 +430,7 @@
                 const modelLogo = currentModel ? currentModel.logo : 'https://placehold.co/20x20/FFFFFF/000000?text=?';
 
                 const modelDisplayHTML = `
-                    <img src="${modelLogo}" alt="${modelName} logo" class="w-5 h-5 mr-2 rounded-full flex-shrink-0">
+                    <img src="${modelLogo}" alt="${modelName} logo" class="w-5 h-5 mr-2 rounded-full flex-shrink-0 object-cover">
                     <span class="truncate">${modelName}</span>
                     <svg class="w-4 h-4 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 `;
@@ -496,8 +507,8 @@
                 state.activeConversationId = newId;
                 loadConversation(newId);
                  if (window.innerWidth <= 768 && dom.conversationsContainer.classList.contains('expanded')) {
-                    toggleSidebar();
-                }
+                     toggleSidebar();
+                 }
             }
 
             function addMessageToChat({ role, content, modelUsed = null, thinkingTime = null, timestamp }, index) {
@@ -795,11 +806,11 @@
                     console.error('Puter.js Error:', error);
                     let errorMessage = "An unexpected error occurred.";
                      try { 
-                        const errorJson = JSON.parse(error.message);
-                        if (errorJson.status === 401) errorMessage = "Authentication failed. Your Puter session may have expired. Please try logging out and back in.";
-                        else if (errorJson.error?.delegate === 'usage-limited-chat') errorMessage = "Puter.js usage limit reached. Please check your account dashboard.";
-                        else errorMessage = errorJson.error?.message || errorJson.message || 'An unknown error occurred.';
-                    } catch (e) { errorMessage = error.message; }
+                         const errorJson = JSON.parse(error.message);
+                         if (errorJson.status === 401) errorMessage = "Authentication failed. Your Puter session may have expired. Please try logging out and back in.";
+                         else if (errorJson.error?.delegate === 'usage-limited-chat') errorMessage = "Puter.js usage limit reached. Please check your account dashboard.";
+                         else errorMessage = errorJson.error?.message || errorJson.message || 'An unknown error occurred.';
+                     } catch (e) { errorMessage = error.message; }
                     const errorResponse = { 
                         role: 'assistant', 
                         content: `**Error:** ${errorMessage}`, 
@@ -1069,7 +1080,7 @@
                             item.href = '#';
                             item.className = 'flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)]';
                             item.dataset.modelId = model.id;
-                            item.innerHTML = `<img src="${model.logo}" alt="${model.name} logo" class="w-5 h-5 mr-3 rounded-full"><span>${model.name}</span>`;
+                            item.innerHTML = `<img src="${model.logo}" alt="${model.name} logo" class="w-5 h-5 mr-3 rounded-full object-cover"><span>${model.name}</span>`;
                             item.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 state.currentModel = model.id;
@@ -1090,4 +1101,4 @@
         });
     </script>
 </body>
-</html
+</html>
