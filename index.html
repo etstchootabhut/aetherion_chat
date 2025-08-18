@@ -290,6 +290,10 @@
     </div>
 
     <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+      .then(() => console.log("Service Worker Registered"));
+  }
         // The Javascript logic remains the same as it was already well-structured.
         // The fixes are primarily in the CSS and HTML structure to handle layout.
         document.addEventListener('DOMContentLoaded', () => {
@@ -1101,10 +1105,6 @@
 
             init();
         });
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js")
-      .then(() => console.log("Service Worker Registered"));
-  }
     </script>
 </body>
 </html>
