@@ -2,25 +2,20 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Multi-Model AI Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Puter.js for AI functionality -->
     <script src="https://js.puter.com/v2/"></script>
-    <!-- Marked.js for Markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- highlight.js for code syntax highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- Hammer.js for better touch support -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <style>
-        /* Custom Styles */
         :root {
             --background-dark: #0D0D0D;
             --surface-dark: #1A1A1A;
             --surface-light: #2C2C2C;
-            --primary-accent: #C8A2C8; /* Purplish-pink */
+            --primary-accent: #C8A2C8;
             --text-light: #EAEAEA;
             --text-dark: #1a1a1a;
             --hover-dark: #3D3D3D;
@@ -31,18 +26,33 @@
         }
         .dark { background-color: var(--background-dark); color: var(--text-light); }
 
-        .chat-bubble { max-width: 80%; word-wrap: break-word; }
-        .chat-bubble pre { background-color: #000; padding: 1rem; border-radius: 0.5rem; white-space: pre-wrap; word-wrap: break-word; }
-        .chat-bubble table { width: 100%; border-collapse: collapse; margin-top: 1em; }
-        .chat-bubble th, .chat-bubble td { border: 1px solid var(--hover-dark); padding: 8px; }
+        /* FIX: Added min-width: 0 to prevent flex item from overflowing its container */
+        .chat-bubble { max-width: 85%; word-wrap: break-word; overflow: hidden; min-width: 0; }
+        .chat-bubble pre { border-radius: 0.5rem; white-space: pre-wrap; word-wrap: break-word; }
+
+        #search-input { margin-bottom: 10px; }
+        
+        .chat-bubble .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 0.5rem;
+            border: 1px solid var(--hover-dark);
+            margin-top: 1em;
+        }
+        .chat-bubble table { width: 100%; border-collapse: collapse; }
+        .chat-bubble th, .chat-bubble td { border: 1px solid var(--hover-dark); padding: 8px; border-left: 0; border-right: 0; }
         .chat-bubble th { background-color: var(--surface-light); }
         .chat-bubble code { background-color: var(--surface-dark); padding: 0.2em 0.4em; border-radius: 3px; }
         .chat-bubble pre code { background-color: transparent; padding: 0; }
         
+        .chat-bubble > *:not(:last-child) { margin-bottom: 0.75rem; }
+        .chat-bubble ul, .chat-bubble ol { padding-left: 1.5rem; }
+        .chat-bubble li { margin-bottom: 0.25rem; }
+        .chat-bubble blockquote { border-left: 4px solid var(--primary-accent); padding-left: 1rem; margin-left: 0.25rem; color: #a0aec0; }
+
         .user-bubble { color: var(--text-light) !important; border: none; }
         .user-bubble pre { color: inherit; }
 
-        /* Sidebar Styles */
         #conversations-panel { min-width: 256px; }
         
         .sidebar-text, #search-input-container, #username {
@@ -51,7 +61,6 @@
             white-space: nowrap;
         }
         
-        /* Modern Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--surface-dark); }
         ::-webkit-scrollbar-thumb { background: var(--hover-dark); border-radius: 4px; }
@@ -60,17 +69,23 @@
         #chat-input::-webkit-scrollbar, #memory-content::-webkit-scrollbar, #modal-textarea::-webkit-scrollbar { width: 5px; }
         #chat-input::-webkit-scrollbar-thumb, #memory-content::-webkit-scrollbar-thumb, #modal-textarea::-webkit-scrollbar-thumb { background: var(--primary-accent); }
 
-        /* Thinking Indicator Animation */
         .thinking-dots span { animation: blink 1.4s infinite both; }
         .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
         .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
         @keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
 
-        /* Input area autoresize */
         #chat-input { max-height: 120px; }
         #chat-input:focus { outline: none; box-shadow: none; }
 
-        /* Desktop specific styles */
+        #header-new-chat-btn-desktop, #header-new-chat-btn-mobile {
+            transition: background-color 0.1s ease, transform 0.1s ease; height: 40px;
+        }
+        #header-new-chat-btn-desktop:active, #header-new-chat-btn-mobile:active {
+            background-color: var(--primary-accent);
+            color: var(--background-dark);
+            transform: scale(0.95);
+        }
+
         @media (min-width: 769px) {
             #conversations-container {
                 width: 68px;
@@ -85,14 +100,12 @@
                 opacity: 1;
             }
             #conversations-container:not(.expanded) #conversation-list,
-            #conversations-container:not(.expanded) #search-input-container,
-            #conversations-container:not(.expanded) .conversations-header {
+            #conversations-container:not(.expanded) #search-input-container {
                 display: none;
             }
             #header-menu-btn { display: none; }
         }
 
-        /* --- UPDATED Mobile specific styles --- */
         @media (max-width: 768px) {
             #sidebar-menu-btn { display: none; }
             #conversations-container {
@@ -106,9 +119,7 @@
                 width: 256px !important;
                 background-color: var(--surface-dark);
             }
-            #conversations-container.expanded {
-                transform: translateX(0);
-            }
+            #conversations-container.expanded { transform: translateX(0); }
             #conversations-container.expanded .sidebar-text,
             #conversations-container.expanded #search-input-container,
             #conversations-container.expanded #username {
@@ -121,56 +132,17 @@
                 z-index: 30;
             }
             
-            /* Full-screen memories modal on mobile */
-            #memories-modal {
-                padding: 0;
-            }
-            #memories-modal > .bg-\[var\(--surface-dark\)\] {
-                width: 100%;
-                height: 100%;
-                max-width: 100%;
-                max-height: 100%;
-                border-radius: 0;
-            }
-            /* Adjust memories header for mobile */
-            #memories-modal-header h2 {
-                font-size: 1.25rem; /* text-xl */
-            }
-            #memories-modal-header #add-memory-btn {
-                padding: 0.25rem 0.75rem;
-                font-size: 0.875rem; /* text-sm */
-            }
+            #memories-modal { padding: 0; }
+            #memories-modal > .bg-\[var\(--surface-dark\)\] { width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 0; }
+            #memories-modal-header h2 { font-size: 1.25rem; }
+            #memories-modal-header #add-memory-btn { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
             
-            /* Make memory menu button always visible on mobile */
-            .memory-menu-btn {
-                opacity: 1;
-            }
-
-
-            /* --- HEADER FIXES --- */
-            #header-menu-btn, 
-            #main-header .absolute.right-4 {
-                position: static;
-                transform: none;
-            }
-
-            #main-header {
-                gap: 0.5rem; /* 8px */
-            }
-
-            #main-header .flex-1.text-center {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                min-width: 0; 
-            }
+            #header-menu-btn, #main-header .absolute.right-4 { position: static; transform: none; }
+            #main-header { gap: 0.5rem; }
+            #main-header .flex-1.text-center { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+            #mobile-header-title-container { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
             
-            #mobile-header-title-container {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 100%; 
-            }
+            main > footer { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
         }
     </style>
 </head>
@@ -205,41 +177,30 @@
                     <button id="close-memories-btn" class="p-2 rounded-full hover:bg-[var(--hover-dark)] text-2xl leading-none">&times;</button>
                 </div>
             </div>
-            <div id="memories-list" class="flex-grow overflow-y-auto space-y-3">
-                <!-- Memories will be rendered here -->
-            </div>
+            <div id="memories-list" class="flex-grow overflow-y-auto space-y-3"></div>
         </div>
     </div>
 
     <!-- Main App Container (Initially Hidden) -->
     <div id="app" class="flex w-full h-full relative hidden">
         <div id="sidebar-backdrop" class="hidden"></div>
-        <!-- Left Panel Container -->
         <div id="conversations-container" class="h-full flex flex-col shadow-lg">
             <aside id="conversations-panel" class="h-full flex flex-col p-2 space-y-2">
-                <!-- Header -->
                 <div class="flex items-center space-x-2 h-12">
                      <button id="sidebar-menu-btn" title="Menu" class="p-3 rounded-md hover:bg-[var(--hover-dark)] flex-shrink-0">
                          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                     <span id="username" class="font-bold text-lg truncate sidebar-text"></span>
                 </div>
-
-                <!-- Search -->
                 <div id="search-input-container" class="relative flex items-center">
                      <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
                     <input id="search-input" type="text" placeholder="Search..." class="w-full bg-[var(--surface-light)] rounded-md py-2 pl-10 pr-4 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">
                 </div>
-                
-                <!-- Conversations List -->
-                <div class="flex-grow overflow-y-auto">
-                    <h2 class="sidebar-text text-sm font-bold my-2 px-2 text-gray-400 uppercase conversations-header">Conversations</h2>
+                <div class="flex-grow overflow-y-auto px-1">
                     <div id="conversation-list"></div>
                 </div>
-
-                <!-- Footer Buttons -->
                 <div class="mt-auto space-y-1">
                     <button id="memories-btn" title="Memories" class="w-full flex items-center text-gray-300 hover:bg-[var(--hover-dark)] p-3 rounded-md transition-all duration-300">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
@@ -253,36 +214,34 @@
             </aside>
         </div>
 
-        <!-- Main Content -->
         <main class="flex-1 flex flex-col bg-[var(--background-dark)] min-h-0">
-            <!-- Top Bar -->
             <header id="main-header" class="relative flex items-center justify-between p-4 border-b border-[var(--surface-dark)]">
                 <button id="header-menu-btn" title="Menu" class="p-2 rounded-md hover:bg-[var(--hover-dark)] md:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 
-                <!-- Desktop Header -->
                 <div class="hidden md:flex flex-1 items-center justify-between">
-                    <div class="flex items-baseline space-x-2">
-                        <h2 class="text-2xl font-bold text-gray-300"><span class="text-[var(--primary-accent)]">A</span>etherion</h2>
+                    <div class="flex items-baseline space-x-2 min-w-0">
+                        <h2 class="text-2xl font-bold text-gray-300 flex-shrink-0"><span class="text-[var(--primary-accent)]">A</span>etherion</h2>
                         <span class="text-gray-500 text-xl">/</span>
                         <h1 id="chat-title-desktop" class="text-lg font-bold truncate text-gray-400">New Chat</h1>
                     </div>
                     <div class="flex items-center space-x-4">
                         <div class="relative">
-                            <button id="model-selector-btn-desktop" class="flex items-center bg-[var(--surface-dark)] p-2 rounded-md hover:bg-[var(--hover-dark)]">
-                                <span id="current-model-name-desktop">GPT-4o</span>
-                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <button id="model-selector-btn-desktop" class="flex items-center w-full text-left bg-[var(--surface-dark)] p-2 rounded-md hover:bg-[var(--hover-dark)]">
+                                <img src="https://placehold.co/20x20/10A37F/FFFFFF?text=O" alt="GPT-4o Mini logo" class="w-5 h-5 mr-2 rounded-full flex-shrink-0">
+                                <span class="truncate">GPT-4o Mini</span>
+                                <svg class="w-4 h-4 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
-                            <div id="model-selector-dropdown-desktop" class="absolute right-0 mt-2 w-72 bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-10 max-h-96 overflow-y-auto"></div>
+                            <div id="model-selector-dropdown-desktop" class="absolute right-0 mt-2 w-72 bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-10"></div>
                         </div>
-                        <button id="header-new-chat-btn-desktop" title="New Chat" class="p-2 rounded-md hover:bg-[var(--hover-dark)]">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <button id="header-new-chat-btn-desktop" class="flex items-center space-x-2 bg-[var(--surface-dark)] px-4 py-2 rounded-md hover:bg-[var(--hover-dark)] text-sm font-semibold">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            <span>New Chat</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mobile Header -->
                 <div class="flex-1 text-center md:hidden">
                     <div id="mobile-header-title-container" class="flex items-baseline justify-center space-x-2">
                         <h2 class="text-md font-bold text-gray-300"><span class="text-[var(--primary-accent)]">A</span>etherion</h2>
@@ -290,24 +249,24 @@
                         <h1 id="chat-title-mobile" class="text-sm font-bold truncate text-gray-400">New Chat</h1>
                     </div>
                     <div class="relative inline-block mt-1">
-                        <button id="model-selector-btn-mobile" class="flex items-center bg-[var(--surface-dark)] p-2 rounded-md hover:bg-[var(--hover-dark)] text-xs">
-                            <span id="current-model-name-mobile">GPT-4o</span>
-                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <button id="model-selector-btn-mobile" class="flex items-center w-full text-left bg-[var(--surface-dark)] p-2 rounded-md hover:bg-[var(--hover-dark)] text-xs">
+                            <img src="https://placehold.co/20x20/10A37F/FFFFFF?text=O" alt="GPT-4o Mini logo" class="w-5 h-5 mr-2 rounded-full flex-shrink-0">
+                            <span class="truncate">GPT-4o Mini</span>
+                            <svg class="w-4 h-4 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
-                        <div id="model-selector-dropdown-mobile" class="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-10 max-h-96 overflow-y-auto"></div>
+                        <div id="model-selector-dropdown-mobile" class="absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-10"></div>
                     </div>
                 </div>
+                <!-- FIX: Updated mobile new chat button style -->
                 <div class="md:hidden">
-                     <button id="header-new-chat-btn-mobile" title="New Chat" class="p-2 rounded-md hover:bg-[var(--hover-dark)]">
-                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                     <button id="header-new-chat-btn-mobile" title="New Chat" class="flex items-center justify-center bg-[var(--surface-dark)] w-10 h-10 rounded-md hover:bg-[var(--hover-dark)]">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                     </button>
                 </div>
             </header>
 
-            <!-- Chat Window -->
             <div id="chat-window" class="flex-1 p-4 overflow-y-auto"></div>
 
-            <!-- Input Area -->
             <footer class="p-4">
                 <div class="flex items-end bg-[var(--surface-dark)] rounded-[25px] p-2">
                     <textarea id="chat-input" class="flex-1 bg-transparent p-2 text-white resize-none focus:ring-0 overflow-y-auto" placeholder="Type a message..." rows="1"></textarea>
@@ -321,7 +280,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- STATE MANAGEMENT ---
             let state = {
                 conversations: {},
                 activeConversationId: null,
@@ -333,16 +291,19 @@
                 "Flash": [
                     { id: 'openrouter:openai/gpt-4o-mini', name: 'GPT-4o Mini', logo: 'https://placehold.co/20x20/10A37F/FFFFFF?text=O' },
                     { id: 'openrouter:google/gemini-2.5-flash', name: 'Gemini 2.5 Flash', logo: 'https://placehold.co/20x20/4285F4/FFFFFF?text=G' },
-                    { id: 'openrouter:deepseek/deepseek-chat', name: 'DeepSeek Chat', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=D' },
+                    { id: 'openrouter:anthropic/claude-sonnet-4', name: 'Claude Sonnet', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=C' },
+                    { id: 'x-ai/grok-3-mini', name: 'Grok 3 mini', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=X' },
+                    { id: 'openrouter:openai/gpt-4o-mini-search-preview', name: 'GPT-4o Mini search', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=O' },
                 ],
                 "Deep Think": [
-                    { id: 'openrouter:openai/gpt-4o', name: 'GPT-4o', logo: 'https://placehold.co/20x20/10A37F/FFFFFF?text=O' },
-                    { id: 'openrouter:anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', logo: 'https://placehold.co/20x20/D97706/FFFFFF?text=C' },
-                    { id: 'openrouter:x-ai/grok-3-mini', name: 'Grok 3 Mini', logo: 'https://placehold.co/20x20/000000/FFFFFF?text=X' },
+                    { id: 'gpt-5', name: 'GPT 5', logo: 'https://placehold.co/20x20/10A37F/FFFFFF?text=O' },
+                    { id: 'openrouter:anthropic/claude opus 4', name: 'Claude Opus 4', logo: 'https://placehold.co/20x20/D97706/FFFFFF?text=C' },
+                    { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 pro', logo: 'https://placehold.co/20x20/4285F4/FFFFFF?text=G' },
+                    { id: 'x-ai/grok-4', name: 'Grok 4', logo: 'https://placehold.co/20x20/000000/FFFFFF?text=X' },
+                    { id: 'openrouter:deepseek/deepseek r1', name: 'Deepseek-r1', logo: 'https://placehold.co/20x20/FF0080/FFFFFF?text=D' },
                 ]
             };
 
-            // --- DOM ELEMENTS ---
             const dom = {
                 app: document.getElementById('app'),
                 loginOverlay: document.getElementById('login-overlay'),
@@ -352,21 +313,14 @@
                 chatInput: document.getElementById('chat-input'),
                 sendBtn: document.getElementById('send-btn'),
                 conversationList: document.getElementById('conversation-list'),
-                
-                // Desktop Header
                 headerNewChatBtnDesktop: document.getElementById('header-new-chat-btn-desktop'),
                 modelSelectorBtnDesktop: document.getElementById('model-selector-btn-desktop'),
                 modelSelectorDropdownDesktop: document.getElementById('model-selector-dropdown-desktop'),
-                currentModelNameDesktop: document.getElementById('current-model-name-desktop'),
                 chatTitleDesktop: document.getElementById('chat-title-desktop'),
-
-                // Mobile Header
                 headerNewChatBtnMobile: document.getElementById('header-new-chat-btn-mobile'),
                 modelSelectorBtnMobile: document.getElementById('model-selector-btn-mobile'),
                 modelSelectorDropdownMobile: document.getElementById('model-selector-dropdown-mobile'),
-                currentModelNameMobile: document.getElementById('current-model-name-mobile'),
                 chatTitleMobile: document.getElementById('chat-title-mobile'),
-
                 conversationsContainer: document.getElementById('conversations-container'),
                 sidebarMenuBtn: document.getElementById('sidebar-menu-btn'),
                 headerMenuBtn: document.getElementById('header-menu-btn'),
@@ -384,7 +338,6 @@
                 sidebarBackdrop: document.getElementById('sidebar-backdrop'),
             };
 
-            // --- INDEXEDDB SETUP ---
             let db;
             function initDB() {
                 const request = indexedDB.open('AI_Chat_App_DB_PuterOnly', 1);
@@ -401,7 +354,6 @@
                 };
             }
 
-            // --- INITIALIZATION & AUTH ---
             function init() {
                 initDB();
                 populateModelSelector();
@@ -422,7 +374,6 @@
                 }
             }
 
-            // --- DATABASE LOGIC ---
             function saveStateToDB() {
                 if (!db) return;
                 try {
@@ -441,7 +392,7 @@
                 request.onsuccess = () => {
                     if (request.result) {
                         state = { ...state, ...request.result };
-                        if (!state.memories) state.memories = []; // Ensure memories array exists
+                        if (!state.memories) state.memories = [];
                     }
                     if (!state.activeConversationId || !state.conversations[state.activeConversationId]) {
                         createNewConversation();
@@ -453,7 +404,6 @@
                 };
             }
             
-            // --- UI RENDERING & HELPERS ---
             function getCurrentModel() {
                 for (const category in models) {
                     const foundModel = models[category].find(m => m.id === state.currentModel);
@@ -464,9 +414,18 @@
             
             function updateUI() {
                 const currentModel = getCurrentModel();
+                
                 const modelName = currentModel ? currentModel.name : 'Select Model';
-                dom.currentModelNameDesktop.textContent = modelName;
-                dom.currentModelNameMobile.textContent = modelName;
+                const modelLogo = currentModel ? currentModel.logo : 'https://placehold.co/20x20/FFFFFF/000000?text=?';
+
+                const modelDisplayHTML = `
+                    <img src="${modelLogo}" alt="${modelName} logo" class="w-5 h-5 mr-2 rounded-full flex-shrink-0">
+                    <span class="truncate">${modelName}</span>
+                    <svg class="w-4 h-4 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                `;
+                
+                dom.modelSelectorBtnDesktop.innerHTML = modelDisplayHTML;
+                dom.modelSelectorBtnMobile.innerHTML = modelDisplayHTML;
                 
                 const activeConvo = state.conversations[state.activeConversationId];
                 const chatTitle = activeConvo ? activeConvo.title : 'New Chat';
@@ -490,27 +449,15 @@
                     titleSpan.textContent = convo.title;
                     
                     const menuBtn = document.createElement('button');
-                    menuBtn.className = "conversation-menu-btn sidebar-text p-1 rounded-full hover:bg-black/20 opacity-0 group-hover:opacity-100";
+                    menuBtn.className = "conversation-menu-btn sidebar-text p-1 rounded-full hover:bg-black/20";
                     menuBtn.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>`;
                     
                     const menuDropdown = document.createElement('div');
                     menuDropdown.className = "absolute right-0 mt-2 w-32 bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-20 conversation-menu";
                     menuDropdown.innerHTML = `
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)] rename-btn">Rename</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-red-400 hover:bg-[var(--hover-dark)] delete-btn">Delete</a>
+                        <button class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)] rename-btn">Rename</button>
+                        <button class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-[var(--hover-dark)] delete-btn">Delete</button>
                     `;
-
-                    menuDropdown.querySelector('.rename-btn').addEventListener('click', (e) => {
-                        e.preventDefault(); e.stopPropagation();
-                        renameConversation(convo.id);
-                        menuDropdown.classList.add('hidden');
-                    });
-
-                     menuDropdown.querySelector('.delete-btn').addEventListener('click', (e) => {
-                        e.preventDefault(); e.stopPropagation();
-                        deleteConversation(convo.id);
-                        menuDropdown.classList.add('hidden');
-                    });
 
                     convoDiv.appendChild(titleSpan);
                     const menuContainer = document.createElement('div');
@@ -548,6 +495,9 @@
                 state.conversations[newId] = { id: newId, title: 'New Chat', messages: [initialMessage], model: state.currentModel, timestamp: Date.now() };
                 state.activeConversationId = newId;
                 loadConversation(newId);
+                 if (window.innerWidth <= 768 && dom.conversationsContainer.classList.contains('expanded')) {
+                    toggleSidebar();
+                }
             }
 
             function addMessageToChat({ role, content, modelUsed = null, thinkingTime = null, timestamp }, index) {
@@ -561,7 +511,8 @@
                         const modelInfo = models.Flash.find(m => m.id === modelUsed) || models["Deep Think"].find(m => m.id === modelUsed);
                         if (modelInfo) modelName = modelInfo.name;
                     }
-                    const displayTimestamp = new Date(timestamp).toLocaleString();
+                    const date = new Date(timestamp);
+                    const displayTimestamp = !isNaN(date) ? date.toLocaleString() : 'Just now';
                     const nameplateDiv = document.createElement('div');
                     nameplateDiv.className = 'flex items-center space-x-2 text-xs text-black font-bold mb-2 px-3 py-1 bg-[var(--primary-accent)] rounded-full';
                     nameplateDiv.innerHTML = `
@@ -577,34 +528,11 @@
                 contentDiv.className = `chat-bubble p-3 rounded-lg ${isUser ? 'user-bubble bg-[var(--surface-light)]' : 'bg-[var(--surface-light)]'}`;
                 
                 const contentString = String(content);
-
-                const SHOW_MORE_THRESHOLD = 800;
-                if (role === 'assistant' && contentString.length > SHOW_MORE_THRESHOLD) {
-                    const visiblePart = contentString.substring(0, SHOW_MORE_THRESHOLD);
-                    const hiddenPart = contentString.substring(SHOW_MORE_THRESHOLD);
-
-                    const visibleDiv = document.createElement('div');
-                    visibleDiv.innerHTML = marked.parse(visiblePart + '...');
-
-                    const hiddenDiv = document.createElement('div');
-                    hiddenDiv.innerHTML = marked.parse(hiddenPart);
-                    hiddenDiv.style.display = 'none';
-
-                    const showMoreBtn = document.createElement('button');
-                    showMoreBtn.textContent = 'Show More';
-                    showMoreBtn.className = 'text-sm text-[var(--primary-accent)] mt-2 hover:underline';
-                    showMoreBtn.onclick = () => {
-                        hiddenDiv.style.display = 'block';
-                        showMoreBtn.style.display = 'none';
-                        hiddenDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                    };
-
-                    contentDiv.appendChild(visibleDiv);
-                    contentDiv.appendChild(hiddenDiv);
-                    contentDiv.appendChild(showMoreBtn);
-                    visibleDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                } else if (role === 'assistant') {
-                    contentDiv.innerHTML = marked.parse(contentString);
+                
+                if (role === 'assistant') {
+                    let htmlContent = marked.parse(contentString);
+                    htmlContent = htmlContent.replace(/<table/g, '<div class="table-wrapper"><table').replace(/<\/table>/g, '</table></div>');
+                    contentDiv.innerHTML = htmlContent;
                     contentDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
                 } else {
                     const pre = document.createElement('pre');
@@ -673,8 +601,8 @@
                 indicator.id = 'thinking-indicator';
                 indicator.className = 'flex flex-col mb-4 items-start';
                 indicator.innerHTML = `
-                    <div class="flex items-center space-x-2 text-xs text-gray-400 mb-2 px-3 py-1 bg-[var(--surface-light)] rounded-full">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                    <div class="flex items-center space-x-2 text-xs text-black font-bold mb-2 px-3 py-1 bg-[var(--primary-accent)] rounded-full">
+                        <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                         <span>Aetherion is thinking</span>
                         <span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span>
                     </div>
@@ -688,7 +616,6 @@
                 if (indicator) indicator.remove();
             }
 
-            // --- EVENT LISTENERS ---
             function setupEventListeners() {
                 dom.loginBtn.addEventListener('click', async () => { await puter.auth.signIn(); handleAuthState(); });
                 dom.logoutBtn.addEventListener('click', async () => { await puter.auth.signOut(); handleAuthState(); });
@@ -701,36 +628,44 @@
                 });
                 dom.chatInput.addEventListener('input', () => { dom.chatInput.style.height = 'auto'; dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px'; });
                 
-                // Use Hammer.js for tap events on mobile
-                const mc = new Hammer.Manager(document.body);
-                mc.add(new Hammer.Tap());
+                const handleConversationAction = (e) => {
+                    const target = e.target;
+                    const convoItem = target.closest('#conversation-list > div');
+                    if (!convoItem) return;
+                    const convoId = convoItem.dataset.id;
 
-                mc.on('tap', (e) => {
-                    const newChatBtn = e.target.closest('#header-new-chat-btn-mobile');
-                    const convoItem = e.target.closest('#conversation-list .group');
-                    const menuBtn = e.target.closest('.conversation-menu-btn');
-
-                    if (menuBtn) {
-                        // This event is handled by its own 'click' listener, which stops propagation.
-                        // We just need to prevent the conversation switch from firing.
+                    if (target.closest('.conversation-menu-btn')) {
+                        e.stopPropagation();
+                        const dropdown = convoItem.querySelector('.conversation-menu');
+                        const isHidden = dropdown.classList.contains('hidden');
+                        document.querySelectorAll('.conversation-menu').forEach(m => m.classList.add('hidden'));
+                        if (isHidden) dropdown.classList.remove('hidden');
                         return;
                     }
-
-                    if (newChatBtn) {
-                        createNewConversation();
-                    } else if (convoItem) {
-                        const convoId = convoItem.dataset.id;
-                        if (convoId) {
-                            loadConversation(convoId);
-                            if (window.innerWidth <= 768) {
-                                toggleSidebar();
-                            }
+                    if (target.closest('.rename-btn')) {
+                        e.stopPropagation();
+                        renameConversation(convoId);
+                        target.closest('.conversation-menu').classList.add('hidden');
+                        return;
+                    }
+                    if (target.closest('.delete-btn')) {
+                        e.stopPropagation();
+                        deleteConversation(convoId);
+                        target.closest('.conversation-menu').classList.add('hidden');
+                        return;
+                    }
+                    if (convoId) {
+                        loadConversation(convoId);
+                        if (window.innerWidth <= 768) {
+                            toggleSidebar();
                         }
                     }
-                });
+                };
+                
+                dom.conversationList.addEventListener('click', handleConversationAction);
 
-                // Keep original click for desktop
                 dom.headerNewChatBtnDesktop.addEventListener('click', createNewConversation);
+                dom.headerNewChatBtnMobile.addEventListener('click', createNewConversation);
 
                 [dom.modelSelectorBtnDesktop, dom.modelSelectorBtnMobile].forEach(btn => btn.addEventListener('click', (e) => { 
                     e.stopPropagation();
@@ -749,7 +684,6 @@
                 dom.headerMenuBtn.addEventListener('click', toggleSidebar);
                 dom.sidebarBackdrop.addEventListener('click', toggleSidebar);
 
-                // Desktop hover functionality
                 if (window.innerWidth > 768) {
                     dom.conversationsContainer.addEventListener('mouseenter', () => dom.conversationsContainer.classList.add('expanded'));
                     dom.conversationsContainer.addEventListener('mouseleave', () => dom.conversationsContainer.classList.remove('expanded'));
@@ -757,35 +691,29 @@
                 
                 dom.searchInput.addEventListener('input', (e) => filterConversations(e.target.value));
                 
-                // Memories Modal Listeners
                 dom.memoriesBtn.addEventListener('click', showMemoriesModal);
                 dom.closeMemoriesBtn.addEventListener('click', () => dom.memoriesModal.classList.add('hidden'));
                 dom.addMemoryBtn.addEventListener('click', addNewMemory);
 
                 document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.conversation-menu-btn') && !e.target.closest('.conversation-menu')) {
+                         document.querySelectorAll('.conversation-menu').forEach(m => m.classList.add('hidden'));
+                    }
                     if (!dom.modelSelectorBtnDesktop.contains(e.target) && !dom.modelSelectorDropdownDesktop.contains(e.target)) {
                         dom.modelSelectorDropdownDesktop.classList.add('hidden');
                     }
                      if (!dom.modelSelectorBtnMobile.contains(e.target) && !dom.modelSelectorDropdownMobile.contains(e.target)) {
                         dom.modelSelectorDropdownMobile.classList.add('hidden');
                     }
-                    if (!e.target.closest('.conversation-menu') && !e.target.closest('.group')) {
-                         document.querySelectorAll('.conversation-menu').forEach(m => m.classList.add('hidden'));
-                    }
                 });
             }
 
-            // --- CORE LOGIC ---
             function filterConversations(query) {
                 const lowerCaseQuery = query.toLowerCase();
                 const conversationItems = dom.conversationList.querySelectorAll('div[data-id]');
                 conversationItems.forEach(item => {
                     const title = item.querySelector('span').textContent.toLowerCase();
-                    if (title.includes(lowerCaseQuery)) {
-                        item.style.display = 'flex';
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    item.style.display = title.includes(lowerCaseQuery) ? 'flex' : 'none';
                 });
             }
 
@@ -802,7 +730,7 @@
             }
 
             function deleteConversation(id) {
-                showConfirmModal("Delete Conversation?", "Are you sure you want to delete this conversation? This action cannot be undone.", (confirmed) => {
+                showConfirmModal("Delete Conversation?", "Are you sure? This action cannot be undone.", (confirmed) => {
                     if (confirmed) {
                         delete state.conversations[id];
                         if (state.activeConversationId === id) {
@@ -892,7 +820,6 @@
 
                 const historyToRegen = conversation.messages.slice(0, messageIndex);
                 
-                // Temporarily remove messages after the one being regenerated
                 const originalMessages = [...conversation.messages];
                 conversation.messages.splice(messageIndex);
                 loadConversation(state.activeConversationId);
@@ -913,7 +840,6 @@
                         timestamp: new Date().toISOString()
                     };
                     
-                    // Restore and replace
                     state.conversations[state.activeConversationId].messages = originalMessages;
                     conversation.messages[messageIndex] = newModelResponse;
                     
@@ -933,7 +859,6 @@
                 }
             }
 
-            // --- MEMORIES LOGIC ---
             function showMemoriesModal() {
                 dom.memoriesModal.classList.remove('hidden');
                 renderMemoriesList();
@@ -960,8 +885,7 @@
                     const menuContainer = document.createElement('div');
                     menuContainer.className = "relative";
                     const menuBtn = document.createElement('button');
-                    // On desktop, the button appears on hover. On mobile, it's always visible.
-                    menuBtn.className = "p-1 rounded-full hover:bg-black/20 opacity-0 group-hover:opacity-100 memory-menu-btn";
+                    menuBtn.className = "p-1 rounded-full hover:bg-black/20 memory-menu-btn";
                     menuBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>`;
                     
                     const menuDropdown = document.createElement('div');
@@ -973,7 +897,9 @@
 
                     menuBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        document.querySelectorAll('.memory-menu').forEach(m => m.classList.add('hidden'));
+                        document.querySelectorAll('.memory-menu').forEach(m => {
+                            if (m !== menuDropdown) m.classList.add('hidden');
+                        });
                         menuDropdown.classList.toggle('hidden');
                     });
 
@@ -1037,7 +963,6 @@
                 });
             }
 
-            // --- CUSTOM MODAL FUNCTIONS ---
             function showConfirmModal(title, content, callback) {
                 dom.modalTitle.textContent = title;
                 dom.modalContent.innerHTML = `<p class="text-gray-400">${content}</p>`;
@@ -1129,8 +1054,6 @@
                 cancelBtn.onclick = () => { cleanup(); callback(null); };
             }
 
-
-            // --- MODEL SELECTOR ---
             function populateModelSelector() {
                 const dropdowns = [dom.modelSelectorDropdownDesktop, dom.modelSelectorDropdownMobile];
                 dropdowns.forEach(dropdown => {
@@ -1146,7 +1069,7 @@
                             item.href = '#';
                             item.className = 'flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)]';
                             item.dataset.modelId = model.id;
-                            item.innerHTML = `<img src="${model.logo}" alt="${model.name} logo" class="w-5 h-5 mr-3 rounded-sm"><span>${model.name}</span>`;
+                            item.innerHTML = `<img src="${model.logo}" alt="${model.name} logo" class="w-5 h-5 mr-3 rounded-full"><span>${model.name}</span>`;
                             item.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 state.currentModel = model.id;
@@ -1167,4 +1090,4 @@
         });
     </script>
 </body>
-</html>
+</html
