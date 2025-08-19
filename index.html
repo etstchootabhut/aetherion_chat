@@ -363,6 +363,29 @@
             text-decoration: underline;
         }
 
+        .content-wrapper.truncated {
+    max-height: 250px; /* Adjust this value to control the initial height */
+    overflow: hidden;
+    position: relative;
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.read-more-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--primary-accent);
+    font-weight: bold;
+    cursor: pointer;
+    font-size: inherit;
+    margin-top: 0.5rem; /* Add some space above the button */
+}
+
+.user-bubble .read-more-toggle-btn {
+    color: var(--text-dark);
+    text-decoration: underline;
+}
+
         #scroll-to-bottom {
             position: absolute;
             bottom: 1rem;
@@ -467,7 +490,6 @@
             position: relative;
             background-color: var(--surface-dark);
             border-radius: 0.5rem;
-            margin-top: 1em;
             padding: 1rem;
             padding-top: 2.5rem;
         }
@@ -1046,17 +1068,31 @@
                 const button = document.createElement('button');
                 button.className = 'copy-code-btn';
                 button.textContent = 'Copy';
+                
+                // --- Start of Replacement ---
                 button.addEventListener('click', () => {
-                    navigator.clipboard.writeText(code.textContent).then(() => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = code.textContent;
+                    // Make the textarea invisible
+                    textArea.style.position = 'fixed';
+                    textArea.style.top = '-9999px';
+                    textArea.style.left = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
                         button.textContent = 'Copied!';
-                        setTimeout(() => {
-                            button.textContent = 'Copy';
-                        }, 2000);
-                    }).catch(err => {
-                        console.error('Failed to copy text: ', err);
+                    } catch (err) {
+                        console.error('Fallback copy failed', err);
                         button.textContent = 'Error';
-                    });
+                    }
+                    document.body.removeChild(textArea);
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                    }, 2000);
                 });
+                // --- End of Replacement ---
+
                 pre.replaceWith(container);
                 container.appendChild(button);
                 container.appendChild(pre);
@@ -1481,6 +1517,8 @@
 
                 const HISTORY_LIMIT = 5;
                 let limitedHistory = messagesToSend.slice(-HISTORY_LIMIT);
+
+                limitedHistory.unshift({ role: 'system', content: 'You MUST format responses using Markdown. Use lists, bolding, and code blocks where appropriate.' });
 
                 if (state.activeCharacterId) {
                     const character = state.characters.find(c => c.id === state.activeCharacterId);
