@@ -49,7 +49,7 @@
             font-weight: 400;
         }
         #app {
-            height: 100vh;
+            height: 100vh; /* Fallback for browsers that don't support dynamic viewport height */
             display: flex;
             flex-direction: column;
         }
@@ -58,16 +58,21 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
-            width: 100%; /* Make main content take full width */
+            width: 100%;
         }
 
         /* Mobile layout adjustments */
         @media (max-width: 768px) {
             #main-header {
-                position: sticky;
+                position: fixed; /* Changed to fixed for mobile keyboard */
                 top: 0;
+                left: 0;
+                right: 0;
                 z-index: 20;
                 background-color: var(--background-dark);
+            }
+            #chat-window-container {
+                padding-top: 90px; /* Adjust based on header height */
             }
             main > footer {
                 position: sticky;
@@ -85,7 +90,6 @@
         }
 
         .chat-bubble {
-            max-width: 95%; /* Increased max-width for wider layout */
             word-wrap: break-word;
             overflow-wrap: break-word;
             min-width: 0;
@@ -102,10 +106,20 @@
             color: var(--text-dark) !important;
             border-bottom-right-radius: 0.25rem;
             box-shadow: 0 4px 12px var(--shadow-color);
+            max-width: 90%;
+            line-height: 1.6;
+            font-weight: 700;
         }
+        .chat-bubble-content {
+    margin-left: -5px;
+}
         .assistant-bubble {
-            background-color: transparent; /* Removed background for a more natural look */
+            background-color: transparent;
             border-bottom-left-radius: 0.25rem;
+            max-width: 100%;
+            line-height: 1.75;
+            font-size: 1.05rem;
+            color: #E0E0E0;
         }
 
         .chat-bubble pre {
@@ -137,6 +151,26 @@
         .user-bubble a { color: var(--text-dark); text-decoration-thickness: 2px; }
         .chat-bubble a:hover {
             background-color: rgba(200, 162, 200, 0.2);
+        }
+
+        /* Improved typography for assistant messages */
+        .assistant-bubble p {
+            margin-bottom: 1em;
+        }
+        .assistant-bubble h1, .assistant-bubble h2, .assistant-bubble h3 {
+            font-weight: 700;
+            margin-top: 1.25em;
+            margin-bottom: 0.5em;
+        }
+        .assistant-bubble ul, .assistant-bubble ol {
+            margin-bottom: 1em;
+            padding-left: 1.5em;
+        }
+        .assistant-bubble li {
+            margin-bottom: 0.25em;
+        }
+        .chat-bubble-content > .content-wrapper > *:last-child {
+            margin-bottom: 0 !important;
         }
 
         #conversations-panel { min-width: 256px; }
@@ -358,7 +392,7 @@
             padding: 1rem;
             border-radius: 0.5rem;
             transition: background-color 0.2s ease;
-            position: relative; /* For z-index context */
+            position: relative;
             overflow-x: hidden;
         }
         @media (max-width: 768px) {
@@ -398,16 +432,12 @@
             border-radius: 0.375rem;
             transition: background-color 0.2s ease, color 0.2s ease;
             position: relative;
-            padding-left: 2.5rem; /* Space for checkmark */
+            padding-left: 2.5rem;
         }
         .model-selector-item.selected {
-            /* MODIFIED: Changed selected background to grey */
             background-color: var(--hover-dark);
             color: var(--text-light);
             font-weight: 700;
-        }
-        #chat-window{
-            width: 100vw;
         }
         .model-selector-item.selected::before {
             position: absolute;
@@ -420,7 +450,6 @@
             background-color: var(--surface-light);
         }
 
-        /* Pinned Conversation */
         .conversation-item.pinned {
             background-color: rgba(200, 162, 200, 0.1);
         }
@@ -434,14 +463,13 @@
             color: var(--text-dark);
         }
 
-        /* NEW: Styles for copyable code blocks */
         .code-block-container {
             position: relative;
             background-color: var(--surface-dark);
             border-radius: 0.5rem;
             margin-top: 1em;
             padding: 1rem;
-            padding-top: 2.5rem; /* Space for the button */
+            padding-top: 2.5rem;
         }
         .copy-code-btn {
             position: absolute;
@@ -460,7 +488,6 @@
             background-color: var(--primary-accent);
             color: var(--text-dark);
         }
-
     </style>
 </head>
 <body class="font-sans">
@@ -573,9 +600,9 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
 
-                <div class="hidden md:flex flex-1 items-center justify-between">
+                <div class="hidden md:flex flex-1 items-center justify-between w-full max-w-7xl mx-auto">
                     <div class="flex items-baseline space-x-2 min-w-0">
-                        <h2 class="text-2xl font-bold text-gray-300 flex-shrink-0"><span class="text-[var(--primary-accent)]">A</span>therion</h2>
+                        <h2 class="text-2xl font-bold text-gray-300 flex-shrink-0"><span class="text-[var(--primary-accent)]">A</span>etherion</h2>
                         <span class="text-gray-500 text-xl">/</span>
                         <h1 id="chat-title-desktop" class="text-lg font-bold truncate text-gray-400">New Chat</h1>
                     </div>
@@ -621,30 +648,31 @@
                 <button id="scroll-to-bottom" title="Scroll to latest message">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
                 </button>
-                <div id="chat-window" class="h-full p-4 overflow-y-auto space-y-6"></div>
+                <div id="chat-window" class="h-full p-4 overflow-y-auto space-y-6 w-full max-w-7xl mx-auto"></div>
             </div>
 
             <footer class="p-4 flex-shrink-0">
-                <!-- MODIFIED: Character Switcher -->
-                <div class="relative mb-2 flex items-center space-x-2">
-                    <div class="relative flex-grow">
-                        <button id="character-switcher-btn" class="w-full flex items-center text-left bg-[var(--surface-light)] p-2 rounded-md hover:bg-[var(--hover-dark)] transition-colors">
-                            <!-- Content populated by JS -->
-                        </button>
-                        <div id="character-switcher-dropdown" class="absolute bottom-full left-0 mb-2 w-full max-h-60 overflow-y-auto bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-20 model-selector-dropdown">
-                            <!-- Character list populated by JS -->
+                <div class="w-full max-w-7xl mx-auto">
+                    <div class="relative mb-2 flex items-center space-x-2">
+                        <div class="relative flex-grow">
+                            <button id="character-switcher-btn" class="w-full flex items-center text-left bg-[var(--surface-light)] p-2 rounded-md hover:bg-[var(--hover-dark)] transition-colors">
+                                <!-- Content populated by JS -->
+                            </button>
+                            <div id="character-switcher-dropdown" class="absolute bottom-full left-0 mb-2 w-full max-h-60 overflow-y-auto bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-20 model-selector-dropdown">
+                                <!-- Character list populated by JS -->
+                            </div>
                         </div>
+                        <button id="edit-characters-btn" title="Manage Characters" class="p-2 rounded-md flex-shrink-0 bg-[var(--surface-light)] hover:bg-[var(--hover-dark)] transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </button>
                     </div>
-                    <button id="edit-characters-btn" title="Manage Characters" class="p-2 rounded-md flex-shrink-0 bg-[var(--surface-light)] hover:bg-[var(--hover-dark)] transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    </button>
-                </div>
 
-                <div class="input-container-glow flex items-end p-2">
-                    <textarea id="chat-input" class="flex-1 bg-transparent p-2 text-white resize-none focus:ring-0 overflow-y-auto" placeholder="Type a message..." rows="1"></textarea>
-                    <button id="send-btn" class="modern-btn w-10 h-10 flex items-center justify-center rounded-full ml-2 flex-shrink-0">
-                        <!-- Icon will be managed by JS -->
-                    </button>
+                    <div class="input-container-glow flex items-end p-2">
+                        <textarea id="chat-input" class="flex-1 bg-transparent p-2 text-white resize-none focus:ring-0 overflow-y-auto" placeholder="Type a message..." rows="1"></textarea>
+                        <button id="send-btn" class="modern-btn w-10 h-10 flex items-center justify-center rounded-full ml-2 flex-shrink-0">
+                            <!-- Icon will be managed by JS -->
+                        </button>
+                    </div>
                 </div>
             </footer>
         </main>
@@ -738,7 +766,7 @@
 
         let db;
         function initDB() {
-            const request = indexedDB.open('AI_Chat_App_DB_PuterOnly', 3); // Version bump for schema change
+            const request = indexedDB.open('AI_Chat_App_DB_PuterOnly', 3);
             request.onerror = (event) => console.error("Database error:", event.target.errorCode);
             request.onsuccess = (event) => {
                 db = event.target.result;
@@ -757,7 +785,16 @@
             populateModelSelector();
             setupEventListeners();
             setThinkingState(false);
+            setAppHeight(); // Set initial height
         }
+
+        // NEW: Function to handle app height on mobile to avoid keyboard issues
+        function setAppHeight() {
+            const app = document.getElementById('app');
+            app.style.height = `${window.innerHeight}px`;
+        }
+        window.addEventListener('resize', setAppHeight);
+
 
         async function handleAuthState() {
             const loggedIn = await puter.auth.isSignedIn();
@@ -990,33 +1027,25 @@
         function formatTimestamp(isoString) {
             const date = new Date(isoString);
             if (isNaN(date)) return '';
-
             const month = date.toLocaleString('en-US', { month: 'short' });
             const day = date.getDate();
             const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
-
             return `${month} ${day} | ${time}`;
         }
 
-        // NEW: Function to add copy buttons to code blocks
         function addCopyButtons(element) {
             const codeBlocks = element.querySelectorAll('pre');
             codeBlocks.forEach(pre => {
-                // Avoid adding button if it's already there
                 if (pre.parentElement.classList.contains('code-block-container')) {
                     return;
                 }
-
                 const code = pre.querySelector('code');
                 if (!code) return;
-
                 const container = document.createElement('div');
                 container.className = 'code-block-container';
-
                 const button = document.createElement('button');
                 button.className = 'copy-code-btn';
                 button.textContent = 'Copy';
-
                 button.addEventListener('click', () => {
                     navigator.clipboard.writeText(code.textContent).then(() => {
                         button.textContent = 'Copied!';
@@ -1028,63 +1057,41 @@
                         button.textContent = 'Error';
                     });
                 });
-
-                // Wrap pre in the container and add the button
                 pre.replaceWith(container);
                 container.appendChild(button);
                 container.appendChild(pre);
             });
         }
 
-
         function addMessageToChat({ role, content, modelUsed = null, thinkingTime = null, timestamp }, index) {
             const messageWrapper = document.createElement('div');
-            messageWrapper.className = `flex flex-col mb-4 ${role === 'user' ? 'items-end' : 'items-start'}`;
+            const isUser = role === 'user';
+            messageWrapper.className = `flex flex-col mb-4 ${isUser ? 'items-end' : 'items-start'}`;
             messageWrapper.dataset.messageIndex = index;
 
             if (role === 'assistant' && modelUsed === 'thinking') {
-                messageWrapper.innerHTML = `
-                    <div class="thinking-container">
-                        <div class="thinking-animation">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                            </svg>
-                        </div>
-                        <div class="thinking-text-container">
-                            <span class="thinking-text"></span><span class="typing-cursor"></span>
-                        </div>
-                    </div>
-                `;
+                messageWrapper.innerHTML = `<div class="thinking-container"><div class="thinking-animation"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div><div class="thinking-text-container"><span class="thinking-text"></span><span class="typing-cursor"></span></div></div>`;
                 dom.chatWindow.appendChild(messageWrapper);
                 const thinkingTextElement = messageWrapper.querySelector('.thinking-text');
                 typeWriter(thinkingTextElement, "Aetherion is thinking...");
             } else {
                  if (role === 'assistant') {
-                        let modelName = 'Aetherion';
-                        if (modelUsed !== 'system') {
-                            const modelInfo = models.Flash.find(m => m.id === modelUsed) || models["Deep Think"].find(m => m.id === modelUsed);
-                            if (modelInfo) modelName = modelInfo.name;
-                        }
-
-                        const displayTimestamp = formatTimestamp(timestamp);
-
-                        const nameplateDiv = document.createElement('div');
-                        nameplateDiv.className = 'flex items-center space-x-2 text-xs text-black font-bold mb-2 px-3 py-1 bg-[var(--primary-accent)] rounded-full';
-                        nameplateDiv.innerHTML = `
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                            <span>${modelName} ${thinkingTime ? `(${thinkingTime.toFixed(2)}s)` : ''}</span>
-                            <span class="text-gray-700 font-normal">${displayTimestamp}</span>
-                        `;
-                        messageWrapper.appendChild(nameplateDiv);
+                    let modelName = 'Aetherion';
+                    if (modelUsed !== 'system') {
+                        const modelInfo = models.Flash.find(m => m.id === modelUsed) || models["Deep Think"].find(m => m.id === modelUsed);
+                        if (modelInfo) modelName = modelInfo.name;
+                    }
+                    const displayTimestamp = formatTimestamp(timestamp);
+                    const nameplateDiv = document.createElement('div');
+                    nameplateDiv.className = 'flex items-center space-x-2 text-xs text-black font-bold mb-2 px-3 py-1 bg-[var(--primary-accent)] rounded-full';
+                    nameplateDiv.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg><span>${modelName} ${thinkingTime ? `(${thinkingTime.toFixed(2)}s)` : ''}</span><span class="text-gray-700 font-normal">${displayTimestamp}</span>`;
+                    messageWrapper.appendChild(nameplateDiv);
                  }
 
                 const contentDiv = document.createElement('div');
-                const isUser = role === 'user';
                 contentDiv.className = `chat-bubble p-3 rounded-lg ${isUser ? 'user-bubble' : 'assistant-bubble'}`;
-
                 const innerContentDiv = document.createElement('div');
                 innerContentDiv.className = 'chat-bubble-content';
-
                 const contentString = String(content);
 
                 if (role === 'assistant') {
@@ -1092,7 +1099,6 @@
                     htmlContent = htmlContent.replace(/<table/g, '<div class="table-wrapper"><table').replace(/<\/table>/g, '</table></div>');
                     innerContentDiv.innerHTML = `<div class="content-wrapper">${htmlContent}</div>`;
                     innerContentDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                    // Add copy buttons after rendering
                     addCopyButtons(innerContentDiv);
                 } else {
                     const pre = document.createElement('pre');
@@ -1107,11 +1113,8 @@
                     if (innerContentDiv.scrollHeight > lineClampHeight) {
                         const wrapper = innerContentDiv.querySelector('.content-wrapper');
                         const originalHTML = wrapper.innerHTML;
-
                         const truncateHTML = (html, limit) => {
-                            let truncated = '';
-                            let charCount = 0;
-                            let inTag = false;
+                            let truncated = '', charCount = 0, inTag = false;
                             for (let i = 0; i < html.length; i++) {
                                 const char = html[i];
                                 if (char === '<') inTag = true;
@@ -1120,33 +1123,25 @@
                                 truncated += char;
                                 if (charCount > limit && !inTag) {
                                     let lastSpace = truncated.lastIndexOf(' ');
-                                    if (lastSpace > -1) {
-                                        truncated = truncated.substring(0, lastSpace);
-                                    }
+                                    if (lastSpace > -1) truncated = truncated.substring(0, lastSpace);
                                     return truncated + '... ';
                                 }
                             }
                             return html;
                         };
-
                         const truncatedHTML = truncateHTML(originalHTML, 250);
-
                         const readMoreBtn = document.createElement('button');
                         readMoreBtn.textContent = 'Read More';
                         readMoreBtn.className = 'read-more-btn';
-
                         wrapper.innerHTML = truncatedHTML;
                         wrapper.appendChild(readMoreBtn);
-
                         readMoreBtn.onclick = () => {
                             const showLessBtn = document.createElement('button');
                             showLessBtn.textContent = 'Show Less';
                             showLessBtn.className = 'show-less-btn';
-
                             wrapper.innerHTML = originalHTML;
                             wrapper.appendChild(showLessBtn);
-                            addCopyButtons(wrapper); // Re-apply copy buttons to expanded content
-
+                            addCopyButtons(wrapper);
                             showLessBtn.onclick = () => {
                                 wrapper.innerHTML = truncatedHTML;
                                 wrapper.appendChild(readMoreBtn);
@@ -1155,10 +1150,8 @@
                     }
                 }, 100);
 
-
                 const actionsDiv = document.createElement('div');
                 actionsDiv.className = `flex items-center space-x-2 mt-2 text-gray-400 ${isUser ? 'justify-end' : ''}`;
-
                 const copyBtn = document.createElement('button');
                 copyBtn.title = "Copy";
                 copyBtn.className = "copy-btn hover:text-white";
@@ -1166,16 +1159,10 @@
                 copyBtn.addEventListener('click', (e) => {
                     const button = e.currentTarget;
                     const originalIcon = button.innerHTML;
-
-                    const tempInput = document.createElement('textarea');
-                    tempInput.value = content;
-                    document.body.appendChild(tempInput);
-                    tempInput.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(tempInput);
-
-                    button.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-                    setTimeout(() => { button.innerHTML = originalIcon; }, 1500);
+                    navigator.clipboard.writeText(content).then(() => {
+                        button.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                        setTimeout(() => { button.innerHTML = originalIcon; }, 1500);
+                    });
                 });
                 actionsDiv.appendChild(copyBtn);
 
@@ -1543,7 +1530,8 @@
 
                     fullResponseContent += chunkContent;
                     if (responseContentElement) {
-                        responseContentElement.textContent = fullResponseContent;
+                        let htmlContent = marked.parse(fullResponseContent + '█');
+                        responseContentElement.innerHTML = htmlContent;
                         dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight;
                     }
                 }
@@ -1572,7 +1560,7 @@
                             htmlContent = htmlContent.replace(/<table/g, '<div class="table-wrapper"><table').replace(/<\/table>/g, '</table></div>');
                             contentDiv.innerHTML = `<div class="content-wrapper">${htmlContent}</div>`;
                             contentDiv.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
-                            addCopyButtons(contentDiv); // Add copy buttons to the final rendered message
+                            addCopyButtons(contentDiv);
                         }
                     }
 
@@ -1588,7 +1576,6 @@
 
                 setThinkingState(false);
                 saveStateToDB();
-                loadConversation(state.activeConversationId);
             }
         }
 
@@ -2092,3 +2079,5 @@
     </script>
 </body>
 </html>
+"
+The chat name is too big make it small and the model selector too. and make the name of chat and model selector in one line in mob
