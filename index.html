@@ -18,7 +18,7 @@
         if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
         .then(() => console.log('Service Worker Registered'));
-    }
+        }
     </script>
     <style>
         :root {
@@ -110,9 +110,12 @@
             line-height: 1.6;
             font-weight: 700;
         }
+        .user-bubble .content-wrapper {
+            white-space: pre-wrap; /* Preserve user-entered newlines */
+        }
         .chat-bubble-content {
-    margin-left: -5px;
-}
+            margin-left: -5px;
+        }
         .assistant-bubble {
             background-color: transparent;
             border-bottom-left-radius: 0.25rem;
@@ -125,7 +128,6 @@
         .chat-bubble pre {
             white-space: pre-wrap;
             word-wrap: break-word;
-            font-family: inherit;
         }
         .chat-bubble .table-wrapper { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 0.5rem; border: 1px solid var(--hover-dark); margin-top: 1em; }
         .chat-bubble table { width: 100%; border-collapse: collapse; }
@@ -136,8 +138,6 @@
         .chat-bubble code { padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
         .chat-bubble pre > code { background-color: transparent; padding: 0; }
         .chat-bubble > *:not(:last-child) { margin-bottom: 0.75rem; }
-        .chat-bubble ul, .chat-bubble ol { padding-left: 1.5rem; }
-        .chat-bubble li { margin-bottom: 0.25rem; }
         .chat-bubble blockquote { border-left: 4px solid var(--primary-accent); padding-left: 1rem; margin-left: 0.25rem; color: #a0aec0; }
 
         .chat-bubble a {
@@ -162,13 +162,31 @@
             margin-top: 1.25em;
             margin-bottom: 0.5em;
         }
-        .assistant-bubble ul, .assistant-bubble ol {
+        
+        /* --- STYLES FOR LISTS --- */
+        .assistant-bubble ul {
+            list-style: disc; /* Use standard disc bullets */
+            padding-left: 2rem; /* Indent the list */
             margin-bottom: 1em;
-            padding-left: 1.5em;
+        }
+        .assistant-bubble ol {
+             list-style-type: decimal;
+             padding-left: 2rem;
+             margin-bottom: 1em;
         }
         .assistant-bubble li {
-            margin-bottom: 0.25em;
+            padding-left: 0.5rem; /* Space between bullet and text */
+            margin-bottom: 0.5rem;
         }
+        .assistant-bubble li::marker {
+            color: var(--primary-accent);
+            font-weight: bold;
+        }
+        .assistant-bubble p > strong, .assistant-bubble li > strong {
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
         .chat-bubble-content > .content-wrapper > *:last-child {
             margin-bottom: 0 !important;
         }
@@ -363,33 +381,17 @@
             text-decoration: underline;
         }
 
-        .content-wrapper.truncated {
-    max-height: 250px; /* Adjust this value to control the initial height */
-    overflow: hidden;
-    position: relative;
-    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-}
-
-.read-more-toggle-btn {
-    background: none;
-    border: none;
-    color: var(--primary-accent);
-    font-weight: bold;
-    cursor: pointer;
-    font-size: inherit;
-    margin-top: 0.5rem; /* Add some space above the button */
-}
-
-.user-bubble .read-more-toggle-btn {
-    color: var(--text-dark);
-    text-decoration: underline;
-}
-
-        #scroll-to-bottom {
+        #scroll-controls {
             position: absolute;
-            bottom: 1rem;
+            bottom: 5.5rem; /* MOVED UP */
             right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .scroll-btn {
             background-color: rgba(0,0,0,0.5);
             backdrop-filter: blur(5px);
             color: white;
@@ -400,14 +402,12 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: opacity 0.3s, transform 0.3s;
-            opacity: 0;
-            transform: translateY(20px);
-            z-index: 10;
+            transition: opacity 0.3s;
+            opacity: 1; /* Always visible by default */
         }
-        #scroll-to-bottom.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .scroll-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
         .memory-card, .character-card {
@@ -442,8 +442,8 @@
             border: 1px solid var(--hover-dark);
             padding: 0.5rem;
         }
-        .model-selector-item
-         .object-cover{
+        .model-selector-item 
+        .object-cover{
             width: 30px;
             height: 30px;
         }
@@ -492,6 +492,7 @@
             border-radius: 0.5rem;
             padding: 1rem;
             padding-top: 2.5rem;
+            margin: 1em 0;
         }
         .copy-code-btn {
             position: absolute;
@@ -532,14 +533,14 @@
 
     <div id="memories-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
          <div id="memories-modal-content" class="bg-[var(--surface-dark)] rounded-lg shadow-xl w-full max-w-4xl h-5/6 flex flex-col p-6">
-               <div id="memories-modal-header" class="flex justify-between items-center mb-4 flex-shrink-0">
-                   <h2 class="text-2xl font-bold">Chat Memories</h2>
-                   <div class="flex items-center space-x-2">
-                       <button id="add-memory-btn" class="text-sm modern-btn font-bold py-2 px-4 rounded-md">Add New Memory</button>
-                       <button id="close-memories-btn" class="p-2 rounded-full hover:bg-[var(--hover-dark)] text-2xl leading-none">&times;</button>
-                   </div>
-               </div>
-               <div id="memories-list" class="flex-grow overflow-y-auto space-y-3 pr-2"></div>
+              <div id="memories-modal-header" class="flex justify-between items-center mb-4 flex-shrink-0">
+                  <h2 class="text-2xl font-bold">Chat Memories</h2>
+                  <div class="flex items-center space-x-2">
+                      <button id="add-memory-btn" class="text-sm modern-btn font-bold py-2 px-4 rounded-md">Add New Memory</button>
+                      <button id="close-memories-btn" class="p-2 rounded-full hover:bg-[var(--hover-dark)] text-2xl leading-none">&times;</button>
+                  </div>
+              </div>
+              <div id="memories-list" class="flex-grow overflow-y-auto space-y-3 pr-2"></div>
          </div>
     </div>
 
@@ -667,9 +668,20 @@
             </header>
 
             <div id="chat-window-container" class="flex-1 relative overflow-hidden">
-                <button id="scroll-to-bottom" title="Scroll to latest message">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                </button>
+                <div id="scroll-controls">
+                    <button id="scroll-to-top" class="scroll-btn" title="Scroll to top">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                    </button>
+                    <button id="scroll-prev" class="scroll-btn" title="Previous message">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                    </button>
+                    <button id="scroll-next" class="scroll-btn" title="Next message">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <button id="scroll-to-bottom" class="scroll-btn" title="Scroll to bottom">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                    </button>
+                </div>
                 <div id="chat-window" class="h-full p-4 overflow-y-auto space-y-6 w-full max-w-7xl mx-auto"></div>
             </div>
 
@@ -767,6 +779,9 @@
             modalContent: document.getElementById('modal-content'),
             modalActions: document.getElementById('modal-actions'),
             sidebarBackdrop: document.getElementById('sidebar-backdrop'),
+            scrollToTopBtn: document.getElementById('scroll-to-top'),
+            scrollPrevBtn: document.getElementById('scroll-prev'),
+            scrollNextBtn: document.getElementById('scroll-next'),
             scrollToBottomBtn: document.getElementById('scroll-to-bottom'),
             characterModal: document.getElementById('character-modal'),
             closeCharacterBtn: document.getElementById('close-character-btn'),
@@ -809,8 +824,7 @@
             setThinkingState(false);
             setAppHeight(); // Set initial height
         }
-
-        // NEW: Function to handle app height on mobile to avoid keyboard issues
+        
         function setAppHeight() {
             const app = document.getElementById('app');
             app.style.height = `${window.innerHeight}px`;
@@ -1008,7 +1022,7 @@
             state.activeConversationId = newId;
             loadConversation(newId);
                  if (window.innerWidth <= 768 && dom.conversationsContainer.classList.contains('expanded')) {
-                      toggleSidebar();
+                     toggleSidebar();
                  }
         }
 
@@ -1069,7 +1083,6 @@
                 button.className = 'copy-code-btn';
                 button.textContent = 'Copy';
                 
-                // --- Start of Replacement ---
                 button.addEventListener('click', () => {
                     const textArea = document.createElement('textarea');
                     textArea.value = code.textContent;
@@ -1091,7 +1104,6 @@
                         button.textContent = 'Copy';
                     }, 2000);
                 });
-                // --- End of Replacement ---
 
                 pre.replaceWith(container);
                 container.appendChild(button);
@@ -1112,16 +1124,16 @@
                 typeWriter(thinkingTextElement, "Aetherion is thinking...");
             } else {
                  if (role === 'assistant') {
-                    let modelName = 'Aetherion';
-                    if (modelUsed !== 'system') {
-                        const modelInfo = models.Flash.find(m => m.id === modelUsed) || models["Deep Think"].find(m => m.id === modelUsed);
-                        if (modelInfo) modelName = modelInfo.name;
-                    }
-                    const displayTimestamp = formatTimestamp(timestamp);
-                    const nameplateDiv = document.createElement('div');
-                    nameplateDiv.className = 'flex items-center space-x-2 text-xs text-black font-bold mb-2 px-3 py-1 bg-[var(--primary-accent)] rounded-full';
-                    nameplateDiv.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg><span>${modelName} ${thinkingTime ? `(${thinkingTime.toFixed(2)}s)` : ''}</span><span class="text-gray-700 font-normal">${displayTimestamp}</span>`;
-                    messageWrapper.appendChild(nameplateDiv);
+                     let modelName = 'Aetherion';
+                     if (modelUsed !== 'system') {
+                         const modelInfo = models.Flash.find(m => m.id === modelUsed) || models["Deep Think"].find(m => m.id === modelUsed);
+                         if (modelInfo) modelName = modelInfo.name;
+                     }
+                     const displayTimestamp = formatTimestamp(timestamp);
+                     const nameplateDiv = document.createElement('div');
+                     nameplateDiv.className = 'flex items-center space-x-2 text-xs text-black font-bold mb-2 px-3 py-1 bg-[var(--primary-accent)] rounded-full';
+                     nameplateDiv.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg><span>${modelName} ${thinkingTime ? `(${thinkingTime.toFixed(2)}s)` : ''}</span><span class="text-gray-700 font-normal">${displayTimestamp}</span>`;
+                     messageWrapper.appendChild(nameplateDiv);
                  }
 
                 const contentDiv = document.createElement('div');
@@ -1412,13 +1424,46 @@
                 }
             });
 
+            dom.scrollToTopBtn.addEventListener('click', () => {
+                dom.chatWindow.scrollTo({ top: 0, behavior: 'smooth' });
+            });
             dom.scrollToBottomBtn.addEventListener('click', () => {
                 dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'smooth' });
             });
+            
+            // --- REVERTED SCROLLING LOGIC ---
+            dom.scrollPrevBtn.addEventListener('click', () => {
+                const messages = Array.from(dom.chatWindow.querySelectorAll('.items-end[data-message-index]'));
+                const currentTop = dom.chatWindow.scrollTop;
+                const prevMessage = messages.reverse().find(m => m.offsetTop < currentTop - 1); // -1 to find strictly previous
+                if (prevMessage) {
+                    prevMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setTimeout(() => dom.chatWindow.scrollBy(0, -16), 500); // scroll 1rem up after smooth scroll
+                } else {
+                    dom.chatWindow.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+            dom.scrollNextBtn.addEventListener('click', () => {
+                const messages = Array.from(dom.chatWindow.querySelectorAll('.items-end[data-message-index]'));
+                const currentBottom = dom.chatWindow.scrollTop + dom.chatWindow.clientHeight;
+                const nextMessage = messages.find(m => m.offsetTop + m.clientHeight > currentBottom + 1); // +1 to find strictly next
+                if (nextMessage) {
+                    nextMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                     setTimeout(() => dom.chatWindow.scrollBy(0, -16), 500); // scroll 1rem up after smooth scroll
+                } else {
+                     dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'smooth' });
+                }
+            });
 
             dom.chatWindow.addEventListener('scroll', () => {
-                const isScrolledUp = dom.chatWindow.scrollTop < (dom.chatWindow.scrollHeight - dom.chatWindow.clientHeight - 200);
-                dom.scrollToBottomBtn.classList.toggle('visible', isScrolledUp);
+                const { scrollTop, scrollHeight, clientHeight } = dom.chatWindow;
+                const atTop = scrollTop < 50;
+                const atBottom = scrollHeight - clientHeight - scrollTop < 50;
+
+                dom.scrollToTopBtn.disabled = atTop;
+                dom.scrollPrevBtn.disabled = atTop;
+                dom.scrollNextBtn.disabled = atBottom;
+                dom.scrollToBottomBtn.disabled = atBottom;
             });
 
             dom.importChatBtn.addEventListener('click', () => dom.importFileInput.click());
@@ -1503,17 +1548,17 @@
                 modelUsed: 'thinking',
                 timestamp: new Date().toISOString()
             };
-            conversation.messages.push(assistantPlaceholder);
-            const thinkingMessageElement = addMessageToChat(assistantPlaceholder, conversation.messages.length - 1);
+            const thinkingMessageElement = addMessageToChat(assistantPlaceholder, conversation.messages.length);
 
             const startTime = performance.now();
             let fullResponseContent = "";
             let finalMessageObject = null;
             let responseContentElement = null;
+            let finalMessageWrapper = null; 
 
             try {
-                let messagesToSend = conversation.messages.slice(0, -1)
-                                               .filter(msg => msg.modelUsed !== 'system');
+                let messagesToSend = conversation.messages.slice(0)
+                                                        .filter(msg => msg.modelUsed !== 'system' && msg.modelUsed !== 'thinking');
 
                 const HISTORY_LIMIT = 5;
                 let limitedHistory = messagesToSend.slice(-HISTORY_LIMIT);
@@ -1534,10 +1579,10 @@
                 const lastUserMessage = messagesToSend.filter(m => m.role === 'user').pop();
                 if (lastUserMessage && lastUserMessage.content.toLowerCase().includes('memory')) {
                      if (state.memories.length > 0) {
-                        const memoryContext = "Here is some information I've saved as memories. Please use this to inform your responses when relevant:\n\n" +
-                                              state.memories.map(m => `Title: ${m.title}\nContent: ${m.content}`).join('\n\n---\n\n');
-                        limitedHistory.unshift({ role: 'system', content: memoryContext });
-                    }
+                         const memoryContext = "Here is some information I've saved as memories. Please use this to inform your responses when relevant:\n\n" +
+                                               state.memories.map(m => `Title: ${m.title}\nContent: ${m.content}`).join('\n\n---\n\n');
+                         limitedHistory.unshift({ role: 'system', content: memoryContext });
+                     }
                 }
 
                 const responseStream = await puter.ai.chat(limitedHistory, {
@@ -1553,17 +1598,17 @@
 
                     if (isFirstChunk) {
                         isFirstChunk = false;
+                        thinkingMessageElement.remove(); // Remove the "thinking..." bubble
+                        
                         finalMessageObject = {
                             role: 'assistant',
                             content: '',
                             modelUsed: state.currentModel,
                             timestamp: new Date().toISOString()
                         };
-                        conversation.messages[conversation.messages.length - 1] = finalMessageObject;
-                        thinkingMessageElement.remove();
-
-                        const newMessageWrapper = addMessageToChat({ ...finalMessageObject, content: '' }, conversation.messages.length - 1);
-                        responseContentElement = newMessageWrapper.querySelector('.content-wrapper');
+                        conversation.messages.push(finalMessageObject);
+                        finalMessageWrapper = addMessageToChat({ ...finalMessageObject, content: '' }, conversation.messages.length - 1);
+                        responseContentElement = finalMessageWrapper.querySelector('.content-wrapper');
                     }
 
                     fullResponseContent += chunkContent;
@@ -1583,29 +1628,20 @@
                     fullResponseContent = `**Error:** An unexpected error occurred. Please check the console for details. The selected model may not be available.`;
                 }
             } finally {
+                thinkingMessageElement?.remove();
+
                 if (wasAborted) {
-                    conversation.messages.pop();
-                    thinkingMessageElement?.remove();
+                    finalMessageWrapper?.remove();
+                    if(finalMessageObject) conversation.messages.pop();
                 } else if (finalMessageObject) {
                     finalMessageObject.content = fullResponseContent;
                     finalMessageObject.thinkingTime = (performance.now() - startTime) / 1000;
-
-                    const finalMessageElement = dom.chatWindow.querySelector(`[data-message-index="${conversation.messages.length - 1}"]`);
-                    if (finalMessageElement) {
-                        const contentDiv = finalMessageElement.querySelector('.chat-bubble-content');
-                        if (contentDiv) {
-                            let htmlContent = marked.parse(fullResponseContent);
-                            htmlContent = htmlContent.replace(/<table/g, '<div class="table-wrapper"><table').replace(/<\/table>/g, '</table></div>');
-                            contentDiv.innerHTML = `<div class="content-wrapper">${htmlContent}</div>`;
-                            contentDiv.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
-                            addCopyButtons(contentDiv);
-                        }
-                    }
-
+                    
+                    // Re-render the final message from scratch to include thinking time and attach all listeners correctly
+                    finalMessageWrapper?.remove();
+                    addMessageToChat(finalMessageObject, conversation.messages.length - 1);
                 } else {
-                    thinkingMessageElement?.remove();
-                    conversation.messages.pop();
-                     if (fullResponseContent) {
+                    if (fullResponseContent) {
                         const errorMsg = { role: 'assistant', content: fullResponseContent, modelUsed: 'system', timestamp: new Date().toISOString() };
                         conversation.messages.push(errorMsg);
                         addMessageToChat(errorMsg, conversation.messages.length - 1);
@@ -1930,14 +1966,10 @@
             };
 
             copyBtn.onclick = () => {
-                const tempInput = document.createElement('textarea');
-                tempInput.value = url;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempInput);
-                copyBtn.textContent = "Copied!";
-                setTimeout(() => { cleanup(); }, 1000);
+                navigator.clipboard.writeText(url).then(() => {
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => { cleanup(); }, 1000);
+                });
             };
 
             cancelBtn.onclick = cleanup;
