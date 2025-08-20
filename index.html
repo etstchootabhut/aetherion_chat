@@ -48,6 +48,10 @@
             font-family: 'Inter', sans-serif;
             font-weight: 400;
         }
+        .aeth {
+    font-size: 15px;
+    padding-left: .7rem;
+}
         #app {
             height: 100vh; /* Fallback for browsers that don't support dynamic viewport height */
             display: flex;
@@ -107,14 +111,11 @@
             border-bottom-right-radius: 0.25rem;
             box-shadow: 0 4px 12px var(--shadow-color);
             max-width: 90%;
-            line-height: 1.6;
             font-weight: 700;
+            padding: 0.5rem;
         }
         .user-bubble .content-wrapper {
             white-space: pre-wrap; /* Preserve user-entered newlines */
-        }
-        .chat-bubble-content {
-            margin-left: -5px;
         }
         .assistant-bubble {
             background-color: transparent;
@@ -128,7 +129,15 @@
         .chat-bubble pre {
             white-space: pre-wrap;
             word-wrap: break-word;
+            padding: 0.5rem;
         }
+        #edit-characters-btn{
+            background-color: #C8A2C8;
+            color: #0D0D0D;
+        }
+        button#model-selector-btn-mobile {
+    width: 13rem;
+}
         .chat-bubble .table-wrapper { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 0.5rem; border: 1px solid var(--hover-dark); margin-top: 1em; }
         .chat-bubble table { width: 100%; border-collapse: collapse; }
         .chat-bubble th, .chat-bubble td { border: 1px solid var(--hover-dark); padding: 8px; border-left: 0; border-right: 0; }
@@ -153,10 +162,6 @@
             background-color: rgba(200, 162, 200, 0.2);
         }
 
-        /* Improved typography for assistant messages */
-        .assistant-bubble p {
-            margin-bottom: 1em;
-        }
         .assistant-bubble h1, .assistant-bubble h2, .assistant-bubble h3 {
             font-weight: 700;
             margin-top: 1.25em;
@@ -207,6 +212,10 @@
         #model-selector-btn-desktop .object-cover{
             width: 30px;
             height: 30px;
+        }
+
+        #chat-window .p-3{
+            padding: 0.2rem;
         }
 
         ::-webkit-scrollbar { width: 8px; }
@@ -458,7 +467,7 @@
             padding-left: 2.5rem;
         }
         .model-selector-item.selected {
-            background-color: var(--hover-dark);
+            background-color: #C8A2C8;
             color: var(--text-light);
             font-weight: 700;
         }
@@ -907,7 +916,7 @@
 
             const modelDisplayHTML = `
                 <img src="${currentModel.logo}" alt="${currentModel.name} logo" class="w-5 h-5 mr-2 rounded-full flex-shrink-0 object-cover">
-                <span class="truncate">${currentModel.name}</span>
+                <span class="truncate aeth">${currentModel.name}</span>
                 <svg class="w-4 h-4 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             `;
 
