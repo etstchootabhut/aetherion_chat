@@ -108,15 +108,19 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .user-bubble {
-            background-color: var(--primary-accent) !important;
-            color: var(--text-dark) !important;
-            border-bottom-right-radius: 0.25rem;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            max-width: 90%;
-            font-weight: 700;
-            padding: 0.5rem;
-        }
+        /* This selector is more specific and will not be overridden */
+div.chat-bubble.user-bubble {
+    background-color: var(--primary-accent) !important;
+    color: var(--text-dark) !important;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    max-width: 90%;
+    font-weight: 700;
+    padding: 0.75rem 1rem;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 0.25rem;
+    border-bottom-left-radius: 1.25rem;
+    border-bottom-right-radius: 1.25rem;
+}
         .user-bubble .content-wrapper {
             white-space: pre-wrap; /* Preserve user-entered newlines */
         }
@@ -140,6 +144,13 @@
         }
         button#model-selector-btn-mobile {
     width: 13rem;
+}
+/* Add this new rule for better HR spacing */
+.assistant-bubble hr {
+    border: none;
+    border-top: 1px solid var(--hover-dark);
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
 }
         .chat-bubble .table-wrapper { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 0.5rem; border: 1px solid var(--hover-dark); margin-top: 1em; }
         .chat-bubble table { width: 100%; border-collapse: collapse; }
@@ -232,7 +243,7 @@
         .thinking-container {
             display: flex;
             align-items: center;
-            background-color: var(--surface-light);
+            background-color: #C8A2C8;
             border-radius: 0.5rem;
             padding: 0.75rem;
             box-shadow: 0 4px 12px var(--shadow-color);
@@ -241,7 +252,12 @@
             animation: fadeInScale 0.3s ease-out forwards;
             transition: opacity 0.3s ease-out;
         }
-
+        /* This ensures all three paths in the animation have the same thickness */
+.thinking-animation .svg-elem-1,
+.thinking-animation .svg-elem-2,
+.thinking-animation .svg-elem-3 {
+    stroke-width: 1.5px !important;
+}
         @keyframes fadeInScale {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
@@ -253,24 +269,67 @@
             position: relative;
             margin-right: 12px;
             flex-shrink: 0;
-            color: var(--primary-accent); /* Set color for SVG */
+            color: #000; /* Set color for SVG */
         }
         
-        .thinking-animation .thinking-svg-main {
-            animation: pulseAndRotate 3s linear infinite;
-        }
+       /* --- FINAL CSS for the Looping "Draw" Animation --- */
 
-        @keyframes pulseAndRotate {
-            0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
-            50% { transform: rotate(180deg) scale(1.05); opacity: 1; }
-            100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
-        }
+/* This sets the starting ("undrawn") state for each path */
+.svg-elem-1 {
+    stroke-dasharray: 26px;
+    stroke-dashoffset: 26px;
+    animation: draw-1 2s ease-in-out infinite;
+}
+.svg-elem-2 {
+    stroke-dasharray: 26px;
+    stroke-dashoffset: 26px;
+    animation: draw-2 2s ease-in-out infinite;
+}
+.svg-elem-3 {
+    stroke-dasharray: 26px;
+    stroke-dashoffset: 26px;
+    animation: draw-3 2s ease-in-out infinite;
+}
+
+/* Keyframes that "draw" each line by moving the dash offset */
+@keyframes draw-1 {
+    /* At 50%, the line is fully drawn and starts to fill with color */
+    50% {
+        stroke-dashoffset: 0;
+        fill: #000;
+    }
+    /* From 75% to 100%, the fill is visible before it loops */
+    75%, 100% {
+        stroke-dashoffset: 0;
+        fill: #000;
+    }
+}
+@keyframes draw-2 {
+    50%, 100% {
+        stroke-dashoffset: 0;
+    }
+}
+@keyframes draw-3 {
+    50%, 100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* This rule targets the ENTIRE "thinking" bubble */
+.thinking-container {
+    background-color: var(--primary-accent) !important; /* Change this color to whatever you want */
+}
+
+/* This rule ensures the icon's direct container has NO background */
+.thinking-animation {
+    background-color: transparent !important;
+}
 
         .thinking-text {
             font-family: monospace;
             white-space: nowrap;
             overflow: hidden;
-            color: var(--text-muted);
+            color: var(--text-dark);
         }
 
         .typing-cursor {
@@ -343,6 +402,50 @@
         .input-container-glow:focus-within::before {
             opacity: 1;
         }
+
+        /* --- ADD THIS CSS FOR THE COPY MODAL --- */
+/* ADD THIS CSS FOR THE COPY MODAL */
+.copy-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Set to a very high value */
+}
+.copy-modal-content {
+    background-color: var(--surface-dark);
+    border: 1px solid var(--hover-dark);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+.copy-modal-textarea {
+    width: 100%;
+    height: 200px;
+    background-color: var(--surface-light);
+    color: var(--text-light);
+    border: 1px solid var(--hover-dark);
+    border-radius: 5px;
+    padding: 0.5rem;
+    font-family: monospace;
+    resize: vertical;
+    margin-bottom: 1rem;
+}
+.copy-modal-close-btn {
+    background-color: var(--primary-accent);
+    color: var(--text-dark);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-end;
+    font-weight: bold;
+}
 
         @media (min-width: 769px) {
             #app { flex-direction: row; }
@@ -1085,7 +1188,7 @@
             return `${month} ${day} | ${time}`;
         }
 
-        function addCopyButtons(element) {
+function addCopyButtons(element) {
     const codeBlocks = element.querySelectorAll('pre');
     codeBlocks.forEach(pre => {
         if (pre.parentElement.classList.contains('code-block-container')) {
@@ -1093,41 +1196,41 @@
         }
         const code = pre.querySelector('code');
         if (!code) return;
-        
+
         const container = document.createElement('div');
         container.className = 'code-block-container';
-        
+
         const button = document.createElement('button');
         button.className = 'copy-code-btn';
         button.textContent = 'Copy';
-        
+
         button.addEventListener('click', () => {
             const codeToCopy = code.textContent;
 
-            // --- Tier 1: Try the Modern API ---
-            navigator.clipboard.writeText(codeToCopy).then(() => {
-                button.textContent = 'Copied!';
-                setTimeout(() => { button.textContent = 'Copy'; }, 2000);
-            }).catch(() => {
-                // --- Tier 2: If Modern API fails, try the Classic Method ---
-                try {
-                    const textArea = document.createElement('textarea');
-                    textArea.value = codeToCopy;
-                    textArea.style.position = 'fixed';
-                    textArea.style.top = '-9999px';
-                    textArea.style.left = '-9999px';
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
+            // Create and show the manual copy modal
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'copy-modal-overlay';
+            
+            modalOverlay.innerHTML = `
+                <div class="copy-modal-content">
+                    <p class="text-gray-400 mb-2 text-sm">Press Ctrl+C or long-press to copy:</p>
+                    <textarea class="copy-modal-textarea"></textarea>
+                    <button class="copy-modal-close-btn">Close</button>
+                </div>
+            `;
+            
+            const textArea = modalOverlay.querySelector('.copy-modal-textarea');
+            textArea.value = codeToCopy;
 
-                    button.textContent = 'Copied!';
-                    setTimeout(() => { button.textContent = 'Copy'; }, 2000);
-                } catch (err) {
-                    // --- Tier 3: If all else fails, show a manual prompt ---
-                    console.error("All copy methods failed:", err);
-                    window.prompt("Auto-copy failed. Please copy manually:", codeToCopy);
-                }
+            document.body.appendChild(modalOverlay);
+
+            // Automatically select the text for the user
+            textArea.focus();
+            textArea.select();
+
+            // Add an event listener to the new close button
+            modalOverlay.querySelector('.copy-modal-close-btn').addEventListener('click', () => {
+                document.body.removeChild(modalOverlay);
             });
         });
 
@@ -1146,12 +1249,14 @@
             if (role === 'assistant' && modelUsed === 'thinking') {
                 messageWrapper.innerHTML = `<div class="thinking-container">
                     <div class="thinking-animation">
-                        <svg class="thinking-svg-main" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21.9953 13.5202L21.2481 13.5855L21.9953 13.5202ZM11.6958 9.11988L11.7644 8.37303L11.6958 9.11988ZM2.00472 11.684L2.75187 11.6187L2.00472 11.684ZM21.7428 14.381L21.1343 13.9426L21.7428 14.381ZM2.09486 12.0645L2.795 11.7956H2.795L2.09486 12.0645ZM2.52818 12.7426L3.0878 12.2432L2.52818 12.7426ZM4.07073 13.8946L3.70888 14.5515H3.70888L4.07073 13.8946ZM4.76127 10.2561C5.1599 10.1436 5.39184 9.72919 5.27932 9.33056C5.16679 8.93192 4.75242 8.69998 4.35378 8.81251L4.76127 10.2561ZM7.4702 15.9948C7.87022 16.1023 8.28165 15.8652 8.38917 15.4652C8.49669 15.0652 8.25957 14.6537 7.85955 14.5462L7.4702 15.9948ZM2.25716 10.8233L2.86569 11.2617L2.86569 11.2617L2.25716 10.8233ZM21.9051 13.1397L21.205 13.4086L21.9051 13.1397ZM21.4718 12.4617L20.9122 12.961L21.4718 12.4617ZM19.9293 11.3096L20.2911 10.6527V10.6527L19.9293 11.3096ZM16.5298 9.20941C16.1298 9.1019 15.7183 9.33902 15.6108 9.73903C15.5033 10.139 15.7404 10.5505 16.1404 10.658L16.5298 9.20941ZM8.33087 16.2098C8.73441 16.3032 9.13727 16.0518 9.23068 15.6483C9.32409 15.2447 9.07268 14.8419 8.66913 14.7484L8.33087 16.2098ZM18.396 15.1476C17.9896 15.2274 17.7248 15.6217 17.8047 16.0281C17.8846 16.4346 18.2788 16.6993 18.6853 16.6194L18.396 15.1476ZM7.96374 8.2781C7.55001 8.29813 7.23085 8.64976 7.25088 9.06349C7.27091 9.47722 7.62254 9.79638 8.03626 9.77635L7.96374 8.2781ZM22.7424 13.4549C22.6596 12.507 21.9299 11.7294 21.0716 11.1335L20.2162 12.3656C20.9828 12.8979 21.2259 13.3314 21.2481 13.5855L22.7424 13.4549ZM21.0716 11.1335C19.1329 9.78749 15.6203 8.7272 11.7644 8.37303L11.6272 9.86674C15.3616 10.2098 18.58 11.2297 20.2162 12.3656L21.0716 11.1335ZM19.6463 16.3917C20.7988 16.0664 21.8119 15.5682 22.3514 14.8194L21.1343 13.9426C20.9013 14.266 20.3052 14.6471 19.2388 14.9481L19.6463 16.3917ZM22.3514 14.8194C22.6343 14.4267 22.7868 13.9627 22.7424 13.4549L21.2481 13.5855C21.2576 13.6937 21.2327 13.806 21.1343 13.9426L22.3514 14.8194ZM1.25756 11.7493C1.27527 11.9519 1.32326 12.1473 1.39472 12.3334L2.795 11.7956C2.7691 11.7282 2.75632 11.6696 2.75187 11.6187L1.25756 11.7493ZM1.39472 12.3334C1.52223 12.6654 1.72455 12.9684 1.96856 13.2419L3.0878 12.2432C2.93276 12.0695 2.8423 11.9188 2.795 11.7956L1.39472 12.3334ZM1.96856 13.2419C2.40103 13.7266 3.00495 14.1638 3.70888 14.5515L4.43259 13.2377C3.81414 12.897 3.36749 12.5567 3.0878 12.2432L1.96856 13.2419ZM3.70888 14.5515C4.15237 14.7958 4.64619 15.0263 5.18026 15.2405L5.73861 13.8482C5.2518 13.653 4.81442 13.448 4.43259 13.2377L3.70888 14.5515ZM4.35378 8.81251C3.47512 9.06053 2.70631 9.4011 2.15313 9.85549C1.588 10.3197 1.18871 10.9611 1.25756 11.7493L2.75187 11.6187C2.73931 11.4749 2.78788 11.2753 3.10524 11.0146C3.43454 10.7441 3.98285 10.4758 4.76127 10.2561L4.35378 8.81251ZM21.0716 11.1335C20.4541 10.7047 19.6876 10.3118 18.8198 9.96378L18.2615 11.356C19.0574 11.6752 19.7165 12.0187 20.2162 12.3656L21.0716 11.1335ZM3.70887 14.5515C4.72605 15.1118 6.017 15.6042 7.4702 15.9948L7.85955 14.5462C6.48709 14.1773 5.31601 13.7243 4.43259 13.2377L3.70887 14.5515ZM1.25756 11.7493C1.34037 12.6972 2.07003 13.4748 2.92837 14.0708L3.78382 12.8386C3.01723 12.3064 2.77407 11.8728 2.75187 11.6187L1.25756 11.7493ZM4.35378 8.81251C3.20132 9.13781 2.18807 9.63607 1.64863 10.3849L2.86569 11.2617C3.0987 10.9382 3.69484 10.5571 4.76127 10.2561L4.35378 8.81251ZM1.64863 10.3849C1.36577 10.7775 1.2132 11.2414 1.25756 11.7492L2.75187 11.6187C2.74242 11.5105 2.76726 11.3983 2.86569 11.2617L1.64863 10.3849ZM22.7424 13.4549C22.7247 13.2522 22.6767 13.0569 22.6053 12.8708L21.205 13.4086C21.2309 13.4761 21.2437 13.5346 21.2481 13.5855L22.7424 13.4549ZM22.6053 12.8708C22.4778 12.5388 22.2754 12.2358 22.0314 11.9623L20.9122 12.961C21.0672 13.1348 21.1577 13.2855 21.205 13.4086L22.6053 12.8708ZM22.0314 11.9623C21.599 11.4777 20.995 11.0404 20.2911 10.6527L19.5674 11.9666C20.1859 12.3072 20.6325 12.6475 20.9122 12.961L22.0314 11.9623ZM20.2911 10.6527C19.8476 10.4084 19.3539 10.178 18.8198 9.96378L18.2615 11.356C18.7482 11.5512 19.1856 11.7562 19.5674 11.9666L20.2911 10.6527ZM19.6463 16.3917C20.525 16.1437 21.2937 15.8031 21.8469 15.3487C22.412 14.8845 22.8113 14.2431 22.7424 13.4549L21.2481 13.5855C21.2607 13.7293 21.2121 13.9289 20.8948 14.1896C20.5655 14.4601 20.0172 14.7284 19.2388 14.9481L19.6463 16.3917ZM2.92837 14.0708C3.54595 14.4995 4.3125 14.8924 5.18026 15.2405L5.73861 13.8482C4.94263 13.529 4.28349 13.1855 3.78381 12.8386L2.92837 14.0708ZM20.2911 10.6527C19.274 10.0924 17.983 9.6 16.5298 9.20941L16.1404 10.658C17.5129 11.0269 18.684 11.4799 19.5674 11.9666L20.2911 10.6527ZM2.92837 14.0708C4.19478 14.95 6.11586 15.6971 8.33087 16.2098L8.66913 14.7484C6.54758 14.2574 4.83166 13.5661 3.78382 12.8386L2.92837 14.0708ZM18.6853 16.6194C19.8304 16.3943 20.8262 16.0508 21.5432 15.573C22.2607 15.0948 22.8237 14.3848 22.7424 13.4549L21.2481 13.5855C21.2621 13.746 21.1959 14.0018 20.7114 14.3248C20.2263 14.6481 19.4472 14.941 18.396 15.1476L18.6853 16.6194ZM11.7644 8.37303C10.4184 8.24939 9.13637 8.22134 7.96374 8.2781L8.03626 9.77635C9.1339 9.72321 10.3456 9.74902 11.6272 9.86674L11.7644 8.37303Z" fill="currentColor"></path>
-                            <path d="M15.2744 4.85061C15.5336 4.68703 15.7852 4.54535 16.0274 4.42706C16.9081 3.99692 17.6637 3.87605 18.2019 4.13627C18.4777 4.26963 18.6797 4.495 18.8114 4.79847C18.9345 5.08191 18.9963 5.43347 18.9998 5.84181M15.2744 4.85061C13.46 5.99564 11.2763 8.21359 9.38191 10.9923M15.2744 4.85061C14.8855 5.09602 14.4797 5.39073 14.0634 5.72967M6.78798 20.8588C6.79135 20.8604 6.79472 20.8621 6.79811 20.8637C6.91163 20.9186 7.03483 20.9566 7.16684 20.9782C7.40386 21.0171 7.66929 21.0035 7.95811 20.9412C8.47355 20.8302 9.06346 20.5644 9.69933 20.1659C9.84815 20.0727 9.9995 19.9721 10.153 19.8646C10.4088 19.6855 10.6706 19.4869 10.9367 19.2703L12.1115 18.3157M6.78798 20.8588C5.96226 20.4501 5.80688 19.2073 6.22201 17.5113M6.78798 20.8588C5.4601 20.2015 5.86563 17.3872 7.58996 14M18.7781 7.48866C18.9285 6.87418 19.004 6.31919 18.9998 5.84181M18.9998 5.84181C19.0073 6.69799 18.7585 7.80381 18.281 9.05476" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                            <path d="M11.7647 14.2813C11.7509 13.3709 11.7441 12.9157 12.0311 12.75C12.3181 12.5843 12.7089 12.8178 13.4905 13.2849L13.6927 13.4058C13.9148 13.5385 14.0258 13.6048 14.1481 13.6203C14.2705 13.6358 14.3902 13.5986 14.6298 13.5242L14.8479 13.4565C15.6908 13.1947 16.1123 13.0638 16.3656 13.2978C16.619 13.5318 16.5364 13.9757 16.3713 14.8635L16.3286 15.0932C16.2817 15.3455 16.2582 15.4716 16.286 15.5949C16.3139 15.7181 16.3898 15.8245 16.5418 16.0372L16.6801 16.2309C17.2148 16.9795 17.4821 17.3538 17.3517 17.6641C17.2213 17.9745 16.7794 18.0153 15.8958 18.0969L15.6672 18.118C15.4161 18.1412 15.2906 18.1528 15.1854 18.2135C15.0803 18.2742 15.0075 18.3771 14.8619 18.583L14.7293 18.7704C14.2168 19.4948 13.9605 19.8571 13.6266 19.8148C13.2926 19.7726 13.1021 19.354 12.7211 18.5166L12.6226 18.3C12.5143 18.062 12.4602 17.943 12.3674 17.8573C12.2745 17.7716 12.1536 17.7288 11.9116 17.6433L11.6914 17.5655C10.8399 17.2646 10.4142 17.1141 10.3383 16.7777C10.2623 16.4413 10.5864 16.1418 11.2345 15.5426L11.4022 15.3876C11.5864 15.2174 11.6785 15.1322 11.7263 15.0186C11.774 14.9049 11.7721 14.7755 11.7682 14.5168L11.7647 14.2813Z" stroke="currentColor" stroke-width="1.5"></path>
-                        </svg>
-                    </div>
+    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="currentColor" stroke-width="1.5">
+        <path class="svg-elem-1" d="M21.9953 13.5202L21.2481 13.5855L21.9953 13.5202ZM11.6958 9.11988L11.7644 8.37303L11.6958 9.11988ZM2.00472 11.684L2.75187 11.6187L2.00472 11.684ZM21.7428 14.381L21.1343 13.9426L21.7428 14.381ZM2.09486 12.0645L2.795 11.7956H2.795L2.09486 12.0645ZM2.52818 12.7426L3.0878 12.2432L2.52818 12.7426ZM4.07073 13.8946L3.70888 14.5515H3.70888L4.07073 13.8946ZM4.76127 10.2561C5.1599 10.1436 5.39184 9.72919 5.27932 9.33056C5.16679 8.93192 4.75242 8.69998 4.35378 8.81251L4.76127 10.2561ZM7.4702 15.9948C7.87022 16.1023 8.28165 15.8652 8.38917 15.4652C8.49669 15.0652 8.25957 14.6537 7.85955 14.5462L7.4702 15.9948ZM2.25716 10.8233L2.86569 11.2617L2.86569 11.2617L2.25716 10.8233ZM21.9051 13.1397L21.205 13.4086L21.9051 13.1397ZM21.4718 12.4617L20.9122 12.961L21.4718 12.4617ZM19.9293 11.3096L20.2911 10.6527V10.6527L19.9293 11.3096ZM16.5298 9.20941C16.1298 9.1019 15.7183 9.33902 15.6108 9.73903C15.5033 10.139 15.7404 10.5505 16.1404 10.658L16.5298 9.20941ZM8.33087 16.2098C8.73441 16.3032 9.13727 16.0518 9.23068 15.6483C9.32409 15.2447 9.07268 14.8419 8.66913 14.7484L8.33087 16.2098ZM18.396 15.1476C17.9896 15.2274 17.7248 15.6217 17.8047 16.0281C17.8846 16.4346 18.2788 16.6993 18.6853 16.6194L18.396 15.1476ZM7.96374 8.2781C7.55001 8.29813 7.23085 8.64976 7.25088 9.06349C7.27091 9.47722 7.62254 9.79638 8.03626 9.77635L7.96374 8.2781ZM22.7424 13.4549C22.6596 12.507 21.9299 11.7294 21.0716 11.1335L20.2162 12.3656C20.9828 12.8979 21.2259 13.3314 21.2481 13.5855L22.7424 13.4549ZM21.0716 11.1335C19.1329 9.78749 15.6203 8.7272 11.7644 8.37303L11.6272 9.86674C15.3616 10.2098 18.58 11.2297 20.2162 12.3656L21.0716 11.1335ZM19.6463 16.3917C20.7988 16.0664 21.8119 15.5682 22.3514 14.8194L21.1343 13.9426C20.9013 14.266 20.3052 14.6471 19.2388 14.9481L19.6463 16.3917ZM22.3514 14.8194C22.6343 14.4267 22.7868 13.9627 22.7424 13.4549L21.2481 13.5855C21.2576 13.6937 21.2327 13.806 21.1343 13.9426L22.3514 14.8194ZM1.25756 11.7493C1.27527 11.9519 1.32326 12.1473 1.39472 12.3334L2.795 11.7956C2.7691 11.7282 2.75632 11.6696 2.75187 11.6187L1.25756 11.7493ZM1.39472 12.3334C1.52223 12.6654 1.72455 12.9684 1.96856 13.2419L3.0878 12.2432C2.93276 12.0695 2.8423 11.9188 2.795 11.7956L1.39472 12.3334ZM1.96856 13.2419C2.40103 13.7266 3.00495 14.1638 3.70888 14.5515L4.43259 13.2377C3.81414 12.897 3.36749 12.5567 3.0878 12.2432L1.96856 13.2419ZM3.70888 14.5515C4.15237 14.7958 4.64619 15.0263 5.18026 15.2405L5.73861 13.8482C5.2518 13.653 4.81442 13.448 4.43259 13.2377L3.70888 14.5515ZM4.35378 8.81251C3.47512 9.06053 2.70631 9.4011 2.15313 9.85549C1.588 10.3197 1.18871 10.9611 1.25756 11.7493L2.75187 11.6187C2.73931 11.4749 2.78788 11.2753 3.10524 11.0146C3.43454 10.7441 3.98285 10.4758 4.76127 10.2561L4.35378 8.81251ZM21.0716 11.1335C20.4541 10.7047 19.6876 10.3118 18.8198 9.96378L18.2615 11.356C19.0574 11.6752 19.7165 12.0187 20.2162 12.3656L21.0716 11.1335ZM3.70887 14.5515C4.72605 15.1118 6.017 15.6042 7.4702 15.9948L7.85955 14.5462C6.48709 14.1773 5.31601 13.7243 4.43259 13.2377L3.70887 14.5515ZM1.25756 11.7493C1.34037 12.6972 2.07003 13.4748 2.92837 14.0708L3.78382 12.8386C3.01723 12.3064 2.77407 11.8728 2.75187 11.6187L1.25756 11.7493ZM4.35378 8.81251C3.20132 9.13781 2.18807 9.63607 1.64863 10.3849L2.86569 11.2617C3.0987 10.9382 3.69484 10.5571 4.76127 10.2561L4.35378 8.81251ZM1.64863 10.3849C1.36577 10.7775 1.2132 11.2414 1.25756 11.7492L2.75187 11.6187C2.74242 11.5105 2.76726 11.3983 2.86569 11.2617L1.64863 10.3849ZM22.7424 13.4549C22.7247 13.2522 22.6767 13.0569 22.6053 12.8708L21.205 13.4086C21.2309 13.4761 21.2437 13.5346 21.2481 13.5855L22.7424 13.4549ZM22.6053 12.8708C22.4778 12.5388 22.2754 12.2358 22.0314 11.9623L20.9122 12.961C21.0672 13.1348 21.1577 13.2855 21.205 13.4086L22.6053 12.8708ZM22.0314 11.9623C21.599 11.4777 20.995 11.0404 20.2911 10.6527L19.5674 11.9666C20.1859 12.3072 20.6325 12.6475 20.9122 12.961L22.0314 11.9623ZM20.2911 10.6527C19.8476 10.4084 19.3539 10.178 18.8198 9.96378L18.2615 11.356C18.7482 11.5512 19.1856 11.7562 19.5674 11.9666L20.2911 10.6527ZM19.6463 16.3917C20.525 16.1437 21.2937 15.8031 21.8469 15.3487C22.412 14.8845 22.8113 14.2431 22.7424 13.4549L21.2481 13.5855C21.2607 13.7293 21.2121 13.9289 20.8948 14.1896C20.5655 14.4601 20.0172 14.7284 19.2388 14.9481L19.6463 16.3917ZM2.92837 14.0708C3.54595 14.4995 4.3125 14.8924 5.18026 15.2405L5.73861 13.8482C4.94263 13.529 4.28349 13.1855 3.78381 12.8386L2.92837 14.0708ZM20.2911 10.6527C19.274 10.0924 17.983 9.6 16.5298 9.20941L16.1404 10.658C17.5129 11.0269 18.684 11.4799 19.5674 11.9666L20.2911 10.6527ZM2.92837 14.0708C4.19478 14.95 6.11586 15.6971 8.33087 16.2098L8.66913 14.7484C6.54758 14.2574 4.83166 13.5661 3.78382 12.8386L2.92837 14.0708ZM18.6853 16.6194C19.8304 16.3943 20.8262 16.0508 21.5432 15.573C22.2607 15.0948 22.8237 14.3848 22.7424 13.4549L21.2481 13.5855C21.2621 13.746 21.1959 14.0018 20.7114 14.3248C20.2263 14.6481 19.4472 14.941 18.396 15.1476L18.6853 16.6194ZM11.7644 8.37303C10.4184 8.24939 9.13637 8.22134 7.96374 8.2781L8.03626 9.77635C9.1339 9.72321 10.3456 9.74902 11.6272 9.86674L11.7644 8.37303Z"/>
+            <path class="svg-elem-2" d="M15.2744 4.85061C15.5336 4.68703 15.7852 4.54535 16.0274 4.42706C16.9081 3.99692 17.6637 3.87605 18.2019 4.13627C18.4777 4.26963 18.6797 4.495 18.8114 4.79847C18.9345 5.08191 18.9963 5.43347 18.9998 5.84181M15.2744 4.85061C13.46 5.99564 11.2763 8.21359 9.38191 10.9923M15.2744 4.85061C14.8855 5.09602 14.4797 5.39073 14.0634 5.72967M6.78798 20.8588C6.79135 20.8604 6.79472 20.8621 6.79811 20.8637C6.91163 20.9186 7.03483 20.9566 7.16684 20.9782C7.40386 21.0171 7.66929 21.0035 7.95811 20.9412C8.47355 20.8302 9.06346 20.5644 9.69933 20.1659C9.84815 20.0727 9.9995 19.9721 10.153 19.8646C10.4088 19.6855 10.6706 19.4869 10.9367 19.2703L12.1115 18.3157M6.78798 20.8588C5.96226 20.4501 5.80688 19.2073 6.22201 17.5113M6.78798 20.8588C5.4601 20.2015 5.86563 17.3872 7.58996 14M18.7781 7.48866C18.9285 6.87418 19.004 6.31919 18.9998 5.84181M18.9998 5.84181C19.0073 6.69799 18.7585 7.80381 18.281 9.05476"/>
+            <path class="svg-elem-3" d="M11.7647 14.2813C11.7509 13.3709 11.7441 12.9157 12.0311 12.75C12.3181 12.5843 12.7089 12.8178 13.4905 13.2849L13.6927 13.4058C13.9148 13.5385 14.0258 13.6048 14.1481 13.6203C14.2705 13.6358 14.3902 13.5986 14.6298 13.5242L14.8479 13.4565C15.6908 13.1947 16.1123 13.0638 16.3656 13.2978C16.619 13.5318 16.5364 13.9757 16.3713 14.8635L16.3286 15.0932C16.2817 15.3455 16.2582 15.4716 16.286 15.5949C16.3139 15.7181 16.3898 15.8245 16.5418 16.0372L16.6801 16.2309C17.2148 16.9795 17.4821 17.3538 17.3517 17.6641C17.2213 17.9745 16.7794 18.0153 15.8958 18.0969L15.6672 18.118C15.4161 18.1412 15.2906 18.1528 15.1854 18.2135C15.0803 18.2742 15.0075 18.3771 14.8619 18.583L14.7293 18.7704C14.2168 19.4948 13.9605 19.8571 13.6266 19.8148C13.2926 19.7726 13.1021 19.354 12.7211 18.5166L12.6226 18.3C12.5143 18.062 12.4602 17.943 12.3674 17.8573C12.2745 17.7716 12.1536 17.7288 11.9116 17.6433L11.6914 17.5655C10.8399 17.2646 10.4142 17.1141 10.3383 16.7777C10.2623 16.4413 10.5864 16.1418 11.2345 15.5426L11.4022 15.3876C11.5864 15.2174 11.6785 15.1322 11.7263 15.0186C11.774 14.9049 11.7721 14.7755 11.7682 14.5168L11.7647 14.2813Z"/>
+        </g>
+    </svg>
+</div>
                     <div class="thinking-text-container">
                         <span class="thinking-text"></span><span class="typing-cursor"></span>
                     </div>
@@ -1481,31 +1586,38 @@
                 dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'smooth' });
             });
             
-            // --- UPDATED SCROLL PREV/NEXT LOGIC ---
             dom.scrollPrevBtn.addEventListener('click', () => {
-                const messages = Array.from(dom.chatWindow.querySelectorAll('.flex-col.items-end'));
-                const currentTop = dom.chatWindow.scrollTop;
-                const prevMessage = messages.filter(m => m.offsetTop < currentTop - 1).pop();
-                if (prevMessage) {
-                    const targetScrollTop = prevMessage.offsetTop - 16;
-                    dom.chatWindow.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
-                } else {
-                    dom.chatWindow.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            });
-
-            dom.scrollNextBtn.addEventListener('click', () => {
-    // This selector is now back to ONLY finding user messages (.items-end)
     const messages = Array.from(dom.chatWindow.querySelectorAll('.flex-col.items-end'));
     
-    // The +20 buffer is still here to prevent the button from getting stuck
-    const nextMessage = messages.find(m => m.offsetTop > dom.chatWindow.scrollTop + 20);
+    // Find the last message that is fully scrolled above the top of the screen
+    const prevMessage = messages.filter(m => m.getBoundingClientRect().bottom < 0).pop();
+
+    if (prevMessage) {
+        // Reliably scroll the top of that message into view
+        prevMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
+        // Apply your 16px offset from the top
+        dom.chatWindow.scrollTop -= 16;
+    } else {
+        // If no message is above, go to the very top
+        dom.chatWindow.scrollTo({ top: 0, behavior: 'auto' });
+    }
+});
+
+dom.scrollNextBtn.addEventListener('click', () => {
+    const messages = Array.from(dom.chatWindow.querySelectorAll('.flex-col.items-end'));
+    const containerHeight = dom.chatWindow.clientHeight;
+
+    // Find the first message whose top is below the bottom of the visible chat window
+    const nextMessage = messages.find(m => m.getBoundingClientRect().top >= containerHeight);
 
     if (nextMessage) {
-        const targetScrollTop = nextMessage.offsetTop - 16;
-        dom.chatWindow.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+        // Reliably scroll the top of that message into view
+        nextMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
+        // Apply your 16px offset from the top
+        dom.chatWindow.scrollTop -= 16;
     } else {
-        dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'smooth' });
+        // If no message is below, go to the very bottom
+        dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'auto' });
     }
 });
 
@@ -1591,122 +1703,111 @@
         }
 
         async function processAIResponse(regenerateIndex = -1) {
-            setThinkingState(true);
-            abortController = new AbortController();
-            let wasAborted = false;
+    setThinkingState(true);
+    abortController = new AbortController();
+    let wasAborted = false;
 
-            const conversation = state.conversations[state.activeConversationId];
+    const conversation = state.conversations[state.activeConversationId];
+    const assistantPlaceholder = { role: 'assistant', content: '', modelUsed: 'thinking', timestamp: new Date().toISOString() };
+    const thinkingMessageElement = addMessageToChat(assistantPlaceholder, conversation.messages.length);
 
-            const assistantPlaceholder = {
-                role: 'assistant',
-                content: '',
-                modelUsed: 'thinking',
-                timestamp: new Date().toISOString()
-            };
-            const thinkingMessageElement = addMessageToChat(assistantPlaceholder, conversation.messages.length);
+    const startTime = performance.now();
+    let fullResponseContent = "";
+    let finalMessageObject = null;
+    let responseContentElement = null;
+    let finalMessageWrapper = null; 
 
-            const startTime = performance.now();
-            let fullResponseContent = "";
-            let finalMessageObject = null;
-            let responseContentElement = null;
-            let finalMessageWrapper = null; 
+    try {
+        let messagesToSend = conversation.messages.slice(0).filter(msg => msg.modelUsed !== 'system' && msg.modelUsed !== 'thinking');
 
-            try {
-                let messagesToSend = conversation.messages.slice(0)
-                                                        .filter(msg => msg.modelUsed !== 'system' && msg.modelUsed !== 'thinking');
+        // You can adjust this number to balance speed vs. context memory
+        const HISTORY_LIMIT = 5; 
+        let limitedHistory = messagesToSend.slice(-HISTORY_LIMIT);
+        
+        const systemPrompts = [];
+        systemPrompts.push('You MUST format responses using Markdown. Use lists, bolding, and code blocks where appropriate.');
 
-                const HISTORY_LIMIT = 5;
-                let limitedHistory = messagesToSend.slice(-HISTORY_LIMIT);
-
-                limitedHistory.unshift({ role: 'system', content: 'You MUST format responses using Markdown. Use lists, bolding, and code blocks where appropriate.' });
-
-                if (state.activeCharacterId) {
-                    const character = state.characters.find(c => c.id === state.activeCharacterId);
-                    if (character) {
-                        let persona = `You are to adopt the following persona. This is a role-playing instruction and you must adhere to it strictly for all subsequent responses.\n\n**Persona Description:**\n${character.description}`;
-                        if(character.tags && character.tags.trim() !== "") {
-                             persona += `\n\n**Key Traits/Tags:**\n${character.tags}`;
-                        }
-                        limitedHistory.unshift({ role: 'system', content: persona });
-                    }
+        if (state.activeCharacterId) {
+            const character = state.characters.find(c => c.id === state.activeCharacterId);
+            if (character) {
+                let persona = `You are to adopt the following persona. This is a role-playing instruction and you must adhere to it strictly for all subsequent responses.\n\n**Persona Description:**\n${character.description}`;
+                if(character.tags && character.tags.trim() !== "") {
+                     persona += `\n\n**Key Traits/Tags:**\n${character.tags}`;
                 }
-
-                const lastUserMessage = messagesToSend.filter(m => m.role === 'user').pop();
-                if (lastUserMessage && lastUserMessage.content.toLowerCase().includes('memory')) {
-                     if (state.memories.length > 0) {
-                           const memoryContext = "Here is some information I've saved as memories. Please use this to inform your responses when relevant:\n\n" +
-                                                 state.memories.map(m => `Title: ${m.title}\nContent: ${m.content}`).join('\n\n---\n\n');
-                           limitedHistory.unshift({ role: 'system', content: memoryContext });
-                     }
-                }
-
-                const responseStream = await puter.ai.chat(limitedHistory, {
-                    model: state.currentModel,
-                    signal: abortController.signal,
-                    stream: true
-                });
-
-                let isFirstChunk = true;
-                for await (const chunk of responseStream) {
-                    const chunkContent = chunk.message?.content || chunk || '';
-                    if (!chunkContent) continue;
-
-                    if (isFirstChunk) {
-                        isFirstChunk = false;
-                        thinkingMessageElement.remove(); // Remove the "thinking..." bubble
-                        
-                        finalMessageObject = {
-                            role: 'assistant',
-                            content: '',
-                            modelUsed: state.currentModel,
-                            timestamp: new Date().toISOString()
-                        };
-                        conversation.messages.push(finalMessageObject);
-                        finalMessageWrapper = addMessageToChat({ ...finalMessageObject, content: '' }, conversation.messages.length - 1);
-                        responseContentElement = finalMessageWrapper.querySelector('.content-wrapper');
-                    }
-
-                    fullResponseContent += chunkContent;
-                    if (responseContentElement) {
-                        let htmlContent = marked.parse(fullResponseContent + '█');
-                        responseContentElement.innerHTML = htmlContent;
-                        dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight;
-                    }
-                }
-
-            } catch (error) {
-                if (error.name === 'AbortError' || error.message === "User cancelled request") {
-                    console.log("Stream aborted by user.");
-                    wasAborted = true;
-                } else {
-                    console.error('Puter.js Error:', error);
-                    fullResponseContent = `**Error:** An unexpected error occurred. Please check the console for details. The selected model may not be available.`;
-                }
-            } finally {
-                thinkingMessageElement?.remove();
-
-                if (wasAborted) {
-                    finalMessageWrapper?.remove();
-                    if(finalMessageObject) conversation.messages.pop();
-                } else if (finalMessageObject) {
-                    finalMessageObject.content = fullResponseContent;
-                    finalMessageObject.thinkingTime = (performance.now() - startTime) / 1000;
-                    
-                    // Re-render the final message from scratch to include thinking time and attach all listeners correctly
-                    finalMessageWrapper?.remove();
-                    addMessageToChat(finalMessageObject, conversation.messages.length - 1);
-                } else {
-                    if (fullResponseContent) {
-                        const errorMsg = { role: 'assistant', content: fullResponseContent, modelUsed: 'system', timestamp: new Date().toISOString() };
-                        conversation.messages.push(errorMsg);
-                        addMessageToChat(errorMsg, conversation.messages.length - 1);
-                    }
-                }
-
-                setThinkingState(false);
-                saveStateToDB();
+                systemPrompts.push(persona);
             }
         }
+
+        const lastUserMessage = messagesToSend.filter(m => m.role === 'user').pop();
+        if (lastUserMessage && lastUserMessage.content.toLowerCase().includes('memory')) {
+             if (state.memories.length > 0) {
+                   const memoryContext = "Here is some information I've saved as memories. Please use this to inform your responses when relevant:\n\n" +
+                                         state.memories.map(m => `Title: ${m.title}\nContent: ${m.content}`).join('\n\n---\n\n');
+                   systemPrompts.push(memoryContext);
+             }
+        }
+        
+        const finalSystemPrompt = systemPrompts.join('\n\n');
+        if (finalSystemPrompt) {
+            limitedHistory.unshift({ role: 'system', content: finalSystemPrompt });
+        }
+        
+        const responseStream = await puter.ai.chat(limitedHistory, {
+            model: state.currentModel,
+            signal: abortController.signal,
+            stream: true
+        });
+
+        let isFirstChunk = true;
+        for await (const chunk of responseStream) {
+            const chunkContent = chunk.message?.content || chunk || '';
+            if (!chunkContent) continue;
+
+            if (isFirstChunk) {
+                isFirstChunk = false;
+                thinkingMessageElement.remove();
+                finalMessageObject = { role: 'assistant', content: '', modelUsed: state.currentModel, timestamp: new Date().toISOString() };
+                conversation.messages.push(finalMessageObject);
+                finalMessageWrapper = addMessageToChat({ ...finalMessageObject, content: '' }, conversation.messages.length - 1);
+                responseContentElement = finalMessageWrapper.querySelector('.content-wrapper');
+            }
+
+            fullResponseContent += chunkContent;
+            if (responseContentElement) {
+                let htmlContent = marked.parse(fullResponseContent + '█');
+                responseContentElement.innerHTML = htmlContent;
+                dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight;
+            }
+        }
+    } catch (error) {
+        if (error.name === 'AbortError' || error.message === "User cancelled request") {
+            console.log("Stream aborted by user.");
+            wasAborted = true;
+        } else {
+            console.error('Puter.js Error:', error);
+            fullResponseContent = `**Error:** An unexpected error occurred. Please check the console for details. The selected model may not be available.`;
+        }
+    } finally {
+        thinkingMessageElement?.remove();
+        if (wasAborted) {
+            finalMessageWrapper?.remove();
+            if(finalMessageObject) conversation.messages.pop();
+        } else if (finalMessageObject) {
+            finalMessageObject.content = fullResponseContent;
+            finalMessageObject.thinkingTime = (performance.now() - startTime) / 1000;
+            finalMessageWrapper?.remove();
+            addMessageToChat(finalMessageObject, conversation.messages.length - 1);
+        } else {
+            if (fullResponseContent) {
+                const errorMsg = { role: 'assistant', content: fullResponseContent, modelUsed: 'system', timestamp: new Date().toISOString() };
+                conversation.messages.push(errorMsg);
+                addMessageToChat(errorMsg, conversation.messages.length - 1);
+            }
+        }
+        setThinkingState(false);
+        saveStateToDB();
+    }
+}
 
         function showMemoriesModal() { dom.memoriesModal.classList.remove('hidden'); renderMemoriesList(); }
         function renderMemoriesList() {
@@ -1953,7 +2054,7 @@
 
         function renderCharacterSwitcher() {
             const activeCharacter = state.characters.find(c => c.id === state.activeCharacterId);
-            const svgIcon = `<span class="mr-2"><svg fill="#C8A2C8" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 409.165 409.164" xml:space="preserve" stroke="#C8A2C8"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M204.583,216.671c50.664,0,91.74-48.075,91.74-107.378c0-82.237-41.074-107.377-91.74-107.377 c-50.668,0-91.74,25.14-91.74,107.377C112.844,168.596,153.916,216.671,204.583,216.671z"></path> <path d="M407.164,374.717L360.88,270.454c-2.117-4.771-5.836-8.728-10.465-11.138l-71.83-37.392 c-1.584-0.823-3.502-0.663-4.926,0.415c-20.316,15.366-44.203,23.488-69.076,23.488c-24.877,0-48.762-8.122-69.078-23.488 c-1.428-1.078-3.346-1.238-4.93-0.415L58.75,259.316c-4.631,2.41-8.346,6.365-10.465,11.138L2.001,374.717 c-3.191,7.188-2.537,15.412,1.75,22.005c4.285,6.592,11.537,10.526,19.4,10.526h362.861c7.863,0,15.117-3.936,19.402-10.527 C409.699,390.129,410.355,381.902,407.164,374.717z"></path> </g> </g> </g></svg></span>`;
+            const svgIcon = `<span class="mr-2"><svg width="25px" height="25px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>profile_round [#1342]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke-width="0.0002" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-140.000000, -2159.000000)" fill="#C8A2C8"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M100.562548,2016.99998 L87.4381713,2016.99998 C86.7317804,2016.99998 86.2101535,2016.30298 86.4765813,2015.66198 C87.7127655,2012.69798 90.6169306,2010.99998 93.9998492,2010.99998 C97.3837885,2010.99998 100.287954,2012.69798 101.524138,2015.66198 C101.790566,2016.30298 101.268939,2016.99998 100.562548,2016.99998 M89.9166645,2004.99998 C89.9166645,2002.79398 91.7489936,2000.99998 93.9998492,2000.99998 C96.2517256,2000.99998 98.0830339,2002.79398 98.0830339,2004.99998 C98.0830339,2007.20598 96.2517256,2008.99998 93.9998492,2008.99998 C91.7489936,2008.99998 89.9166645,2007.20598 89.9166645,2004.99998 M103.955674,2016.63598 C103.213556,2013.27698 100.892265,2010.79798 97.837022,2009.67298 C99.4560048,2008.39598 100.400241,2006.33098 100.053171,2004.06998 C99.6509769,2001.44698 97.4235996,1999.34798 94.7348224,1999.04198 C91.0232075,1998.61898 87.8750721,2001.44898 87.8750721,2004.99998 C87.8750721,2006.88998 88.7692896,2008.57398 90.1636971,2009.67298 C87.1074334,2010.79798 84.7871636,2013.27698 84.044024,2016.63598 C83.7745338,2017.85698 84.7789973,2018.99998 86.0539717,2018.99998 L101.945727,2018.99998 C103.221722,2018.99998 104.226185,2017.85698 103.955674,2016.63598" id="profile_round-[#1342]"> </path> </g> </g> </g> </g></svg></span>`;
 
             dom.characterSwitcherBtn.innerHTML = `
                 ${svgIcon}
