@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" integrity="sha384-KiWOvVjnN8qwKMlbsvycTEUqrkkrqBCYvGzTcwEAjeMONZRFEK7hCEfG4DgAZudt" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" integrity="sha384-hIoBPJpTUs74ddyc4bFZSM1gAUAANpasi9ALUghXtVVTUFHlzYlWxTBHUEagpLMin" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GtitreqcNqpFC7aSbeXHaaZ2+UB5lIBIFeVBIkHda2vvrLAf" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/mhchem.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -954,6 +953,20 @@ function renderMathInElement(element) {
         });
     }
 }
+        // ADD THIS NEW FUNCTION
+function renderChemInElement(element) {
+    if (window.renderChemInElement) {
+        window.renderChemInElement(element, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},  // For block equations
+                {left: '$', right: '$', display: false},   // For inline equations
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });
+    }
+}
 
         function init() {
             initDB();
@@ -1751,7 +1764,7 @@ async function processAIResponse(regenerateIndex = -1) {
 
         const systemPrompts = [];
         // This is the prompt for the advanced 'mhchem' extension
-        systemPrompts.push('You MUST format responses using Markdown. For math, use LaTeX syntax inside `$...$`. For chemical formulas and reactions, use the `\\ce{...}` syntax (e.g., `$\\ce{H2SO4}$`). **Do not use the `\\text{...}` command.**');
+        systemPrompts.push('You MUST format responses using Markdown. For math, use LaTeX syntax inside `$...$`. For Chem, use LaTeX syntax inside `$...$`.');
         
         // ... (The rest of the try block is the same)
         if (state.activeCharacterId) {
@@ -1771,11 +1784,8 @@ async function processAIResponse(regenerateIndex = -1) {
         }
         const finalSystemPrompt = systemPrompts.join('\n\n');
         if (finalSystemPrompt) {
-            limitedHistory.unshift({
-                role: 'system',
-                content: finalSystemPrompt
-            });
-        }
+                limitedHistory.unshift({ role: 'system', content: finalSystemPrompt });
+            }
         const responseStream = await puter.ai.chat(limitedHistory, {
             model: state.currentModel,
             signal: abortController.signal,
@@ -1841,6 +1851,15 @@ async function processAIResponse(regenerateIndex = -1) {
             setTimeout(() => {
                 if (window.renderMathInElement) {
                     window.renderMathInElement(finalMessageWrapper, {
+                        delimiters: [
+                           {left: '$$', right: '$$', display: true},
+                           {left: '$', right: '$', display: false}
+                        ],
+                        throwOnError: false
+                    });
+                }
+                if (window.renderChemInElement) {
+                    window.renderChemInElement(finalMessageWrapper, {
                         delimiters: [
                            {left: '$$', right: '$$', display: true},
                            {left: '$', right: '$', display: false}
@@ -2359,4 +2378,3 @@ async function processAIResponse(regenerateIndex = -1) {
     </script>
 </body>
 </html>
-
