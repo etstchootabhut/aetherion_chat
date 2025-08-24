@@ -1417,14 +1417,14 @@ function addCopyButtons(element) {
             dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight;
         }
 
-        // ... existing code in the function ...
-
-// NEW SAFER CODE: Add this block before the return statement
+        // REPLACE the previous renderMathInElement block with this one
 if (typeof renderMathInElement === 'function') {
     renderMathInElement(messageWrapper, {
         delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '$', right: '$', display: false}
+            {left: '$$', right: '$$', display: true},    // For centered equations
+            {left: '$', right: '$', display: false},     // For inline equations
+            {left: '\\(', right: '\\)', display: false},  // NEW: Recognizes \(...\)
+            {left: '\\[', right: '\\]', display: true}     // NEW: Recognizes \[...\]
         ],
         throwOnError: false
     });
