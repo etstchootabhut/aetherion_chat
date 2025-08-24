@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" integrity="sha384-KiWOvVjnN8qwKMlbsvycTEUqrkkrqBCYvGzTcwEAjeMONZRFEK7hCEfG4DgAZudt" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" integrity="sha384-hIoBPJpTUs74ddyc4bFZSM1gAUAANpasi9ALUghXtVVTUFHlzYlWxTBHUEagpLMin" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GtitreqcNqpFC7aSbeXHaaZ2+UB5lIBIFeVBIkHda2vvrLAf" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" ... ></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" ... ></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -449,7 +449,26 @@ div.chat-bubble.user-bubble {
     align-self: flex-end;
     font-weight: bold;
 }
+/* --- FINAL & AGGRESSIVE KATEX CSS FIX --- */
+.assistant-bubble .katex {
+    display: inline-block; /* Forces the formula to be treated as a single unit */
+    vertical-align: -0.1em; /* Fine-tunes the vertical position */
+    line-height: normal;
+    font-size: 1.1em;
+    text-indent: 0;
+    max-width: 100%;
+}
 
+.katex svg{
+    color: var(--text-light);
+}
+
+.assistant-bubble .katex-display {
+    display: block;
+    overflow-x: auto; /* Adds a scrollbar for very wide equations */
+    white-space: normal;
+    padding: 0.5em 0;
+}
         @media (min-width: 769px) {
             #app { flex-direction: row; }
             #conversations-container { width: 68px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; background-color: var(--surface-dark); }
@@ -523,13 +542,19 @@ div.chat-bubble.user-bubble {
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, background-color 0.3s;
             opacity: 1; /* Always visible by default */
         }
         .scroll-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
+        /* Style for the new dictionary button */
+        .scroll-btn.active {
+            background-color: var(--primary-accent);
+            color: var(--text-dark);
+        }
+
 
         .memory-card, .character-card {
             background-color: var(--surface-light);
@@ -658,17 +683,17 @@ div.chat-bubble.user-bubble {
 
     <div id="memories-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
          <div id="memories-modal-content" class="bg-[var(--surface-dark)] rounded-lg shadow-xl w-full max-w-4xl h-5/6 flex flex-col p-6">
-              <div id="memories-modal-header" class="flex justify-between items-center mb-4 flex-shrink-0">
-                  <h2 class="text-2xl font-bold">Chat Memories</h2>
-                  <div class="flex items-center space-x-2">
-                      <button id="add-memory-btn" class="text-sm modern-btn font-bold py-2 px-4 rounded-md">Add New Memory</button>
-                      <button id="close-memories-btn" class="p-2 rounded-full hover:bg-[var(--hover-dark)] text-2xl leading-none">
+               <div id="memories-modal-header" class="flex justify-between items-center mb-4 flex-shrink-0">
+                   <h2 class="text-2xl font-bold">Chat Memories</h2>
+                   <div class="flex items-center space-x-2">
+                       <button id="add-memory-btn" class="text-sm modern-btn font-bold py-2 px-4 rounded-md">Add New Memory</button>
+                       <button id="close-memories-btn" class="p-2 rounded-full hover:bg-[var(--hover-dark)] text-2xl leading-none">
     <svg fill="#C8A2C8" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492 492" xml:space="preserve" stroke="#C8A2C8" stroke-width="0.00492"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M300.188,246L484.14,62.04c5.06-5.064,7.852-11.82,7.86-19.024c0-7.208-2.792-13.972-7.86-19.028L468.02,7.872 c-5.068-5.076-11.824-7.856-19.036-7.856c-7.2,0-13.956,2.78-19.024,7.856L246.008,191.82L62.048,7.872 c-5.06-5.076-11.82-7.856-19.028-7.856c-7.2,0-13.96,2.78-19.02,7.856L7.872,23.988c-10.496,10.496-10.496,27.568,0,38.052 L191.828,246L7.872,429.952c-5.064,5.072-7.852,11.828-7.852,19.032c0,7.204,2.788,13.96,7.852,19.028l16.124,16.116 c5.06,5.072,11.824,7.856,19.02,7.856c7.208,0,13.968-2.784,19.028-7.856l183.96-183.952l183.952,183.952 c5.068,5.072,11.824,7.856,19.024,7.856h0.008c7.204,0,13.96-2.784,19.028-7.856l16.12-16.116 c5.06-5.064,7.852-11.824,7.852-19.028c0-7.204-2.792-13.96-7.852-19.028L300.188,246z"></path> </g> </g> </g></svg>
 </button>
-                  </div>
-              </div>
-              <div id="memories-list" class="flex-grow overflow-y-auto space-y-3 pr-2"></div>
-         </div>
+                   </div>
+               </div>
+               <div id="memories-list" class="flex-grow overflow-y-auto space-y-3 pr-2"></div>
+          </div>
     </div>
 
     <!-- Character Template Modal -->
@@ -833,23 +858,34 @@ div.chat-bubble.user-bubble {
             </footer>
         </main>
     </div>
+    
+    <!-- Dictionary Container -->
+    <div id="dictionary-container" class="hidden">
+        <div id="dictionary-header">
+            <span id="dictionary-title">Text Simplifier</span>
+            <button id="dictionary-close-btn">&times;</button>
+        </div>
+        <div id="dictionary-content"></div>
+    </div>
+
 
     <!-- Hidden file input for importing chats -->
     <input type="file" id="import-file-input" class="hidden" accept=".aether">
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        let state = {
-            conversations: {},
-            activeConversationId: null,
-            currentModel: 'openrouter:anthropic/claude-3.5-haiku',
-            memories: [],
-            characters: [],
-            activeCharacterId: null,
-            pinnedConversations: [],
-        };
+   <script>
+document.addEventListener('DOMContentLoaded', () => {
+    let state = {
+        conversations: {},
+        activeConversationId: null,
+        currentModel: 'openrouter:anthropic/claude-3.5-haiku',
+        memories: [],
+        characters: [],
+        activeCharacterId: null,
+        pinnedConversations: [],
+        isDictionaryModeActive: false, // New state for dictionary mode
+    };
 
-        const models = {
+    const models = {
             "Flash": [
                 { id: 'openrouter:mistralai/mistral-small-3.1-24b-instruct:free', name: 'Mistral small', logo: 'https://i.pinimg.com/736x/fe/b3/df/feb3df4b8c751dd3924ad3f6f73e5948.jpg' },
                 { id: 'openrouter:openai/gpt-4o-mini', name: 'GPT-4o Mini', logo: 'https://i.pinimg.com/736x/67/a5/96/67a596df5a89ca51c948d0a4a8eea310.jpg' },
@@ -866,361 +902,338 @@ div.chat-bubble.user-bubble {
             ]
         };
 
-        let isThinking = false;
-        let abortController = null;
+    let isThinking = false;
+    let abortController = null;
 
-        const dom = {
-            app: document.getElementById('app'),
-            loginOverlay: document.getElementById('login-overlay'),
-            loginBtn: document.getElementById('login-btn'),
-            logoutBtn: document.getElementById('logout-btn'),
-            chatWindow: document.getElementById('chat-window'),
-            chatInput: document.getElementById('chat-input'),
-            sendBtn: document.getElementById('send-btn'),
-            conversationList: document.getElementById('conversation-list'),
-            headerNewChatBtnDesktop: document.getElementById('header-new-chat-btn-desktop'),
-            modelSelectorBtnDesktop: document.getElementById('model-selector-btn-desktop'),
-            modelSelectorDropdownDesktop: document.getElementById('model-selector-dropdown-desktop'),
-            chatTitleDesktop: document.getElementById('chat-title-desktop'),
-            headerNewChatBtnMobile: document.getElementById('header-new-chat-btn-mobile'),
-            modelSelectorBtnMobile: document.getElementById('model-selector-btn-mobile'),
-            modelSelectorDropdownMobile: document.getElementById('model-selector-dropdown-mobile'),
-            chatTitleMobile: document.getElementById('chat-title-mobile'),
-            conversationsContainer: document.getElementById('conversations-container'),
-            sidebarMenuBtn: document.getElementById('sidebar-menu-btn'),
-            headerMenuBtn: document.getElementById('header-menu-btn'),
-            username: document.getElementById('username'),
-            searchInput: document.getElementById('search-input'),
-            memoriesBtn: document.getElementById('memories-btn'),
-            memoriesModal: document.getElementById('memories-modal'),
-            closeMemoriesBtn: document.getElementById('close-memories-btn'),
-            memoriesList: document.getElementById('memories-list'),
-            addMemoryBtn: document.getElementById('add-memory-btn'),
-            genericModal: document.getElementById('generic-modal'),
-            modalTitle: document.getElementById('modal-title'),
-            modalContent: document.getElementById('modal-content'),
-            modalActions: document.getElementById('modal-actions'),
-            sidebarBackdrop: document.getElementById('sidebar-backdrop'),
-            scrollToTopBtn: document.getElementById('scroll-to-top'),
-            scrollPrevBtn: document.getElementById('scroll-prev'),
-            scrollNextBtn: document.getElementById('scroll-next'),
-            scrollToBottomBtn: document.getElementById('scroll-to-bottom'),
-            characterModal: document.getElementById('character-modal'),
-            closeCharacterBtn: document.getElementById('close-character-btn'),
-            addCharacterBtn: document.getElementById('add-character-btn'),
-            characterList: document.getElementById('character-list'),
-            editCharactersBtn: document.getElementById('edit-characters-btn'),
-            characterSwitcherBtn: document.getElementById('character-switcher-btn'),
-            characterSwitcherDropdown: document.getElementById('character-switcher-dropdown'),
-            importChatBtn: document.getElementById('import-chat-btn'),
-            importFileInput: document.getElementById('import-file-input'),
-            exportChatsBtn: document.getElementById('export-chats-btn'),
-            exportModal: document.getElementById('export-modal'),
-            exportModalContent: document.getElementById('export-modal-content'),
-            closeExportBtn: document.getElementById('close-export-btn'),
-            exportList: document.getElementById('export-list'),
-            exportCancelBtn: document.getElementById('export-cancel-btn'),
-            exportDownloadBtn: document.getElementById('export-download-btn'),
+    const dom = {
+        app: document.getElementById('app'),
+        loginOverlay: document.getElementById('login-overlay'),
+        loginBtn: document.getElementById('login-btn'),
+        logoutBtn: document.getElementById('logout-btn'),
+        chatWindow: document.getElementById('chat-window'),
+        chatInput: document.getElementById('chat-input'),
+        sendBtn: document.getElementById('send-btn'),
+        conversationList: document.getElementById('conversation-list'),
+        headerNewChatBtnDesktop: document.getElementById('header-new-chat-btn-desktop'),
+        modelSelectorBtnDesktop: document.getElementById('model-selector-btn-desktop'),
+        modelSelectorDropdownDesktop: document.getElementById('model-selector-dropdown-desktop'),
+        chatTitleDesktop: document.getElementById('chat-title-desktop'),
+        headerNewChatBtnMobile: document.getElementById('header-new-chat-btn-mobile'),
+        modelSelectorBtnMobile: document.getElementById('model-selector-btn-mobile'),
+        modelSelectorDropdownMobile: document.getElementById('model-selector-dropdown-mobile'),
+        chatTitleMobile: document.getElementById('chat-title-mobile'),
+        conversationsContainer: document.getElementById('conversations-container'),
+        sidebarMenuBtn: document.getElementById('sidebar-menu-btn'),
+        headerMenuBtn: document.getElementById('header-menu-btn'),
+        username: document.getElementById('username'),
+        searchInput: document.getElementById('search-input'),
+        memoriesBtn: document.getElementById('memories-btn'),
+        memoriesModal: document.getElementById('memories-modal'),
+        closeMemoriesBtn: document.getElementById('close-memories-btn'),
+        memoriesList: document.getElementById('memories-list'),
+        addMemoryBtn: document.getElementById('add-memory-btn'),
+        genericModal: document.getElementById('generic-modal'),
+        modalTitle: document.getElementById('modal-title'),
+        modalContent: document.getElementById('modal-content'),
+        modalActions: document.getElementById('modal-actions'),
+        sidebarBackdrop: document.getElementById('sidebar-backdrop'),
+        scrollToTopBtn: document.getElementById('scroll-to-top'),
+        scrollPrevBtn: document.getElementById('scroll-prev'),
+        scrollNextBtn: document.getElementById('scroll-next'),
+        scrollToBottomBtn: document.getElementById('scroll-to-bottom'),
+        characterModal: document.getElementById('character-modal'),
+        closeCharacterBtn: document.getElementById('close-character-btn'),
+        addCharacterBtn: document.getElementById('add-character-btn'),
+        characterList: document.getElementById('character-list'),
+        editCharactersBtn: document.getElementById('edit-characters-btn'),
+        characterSwitcherBtn: document.getElementById('character-switcher-btn'),
+        characterSwitcherDropdown: document.getElementById('character-switcher-dropdown'),
+        importChatBtn: document.getElementById('import-chat-btn'),
+        importFileInput: document.getElementById('import-file-input'),
+        exportChatsBtn: document.getElementById('export-chats-btn'),
+        exportModal: document.getElementById('export-modal'),
+        exportModalContent: document.getElementById('export-modal-content'),
+        closeExportBtn: document.getElementById('close-export-btn'),
+        exportList: document.getElementById('export-list'),
+        exportCancelBtn: document.getElementById('export-cancel-btn'),
+        exportDownloadBtn: document.getElementById('export-download-btn'),
+        // New Dictionary elements
+        dictionaryBtn: document.getElementById('dictionary-btn'),
+        dictionaryContainer: document.getElementById('dictionary-container'),
+        dictionaryHeader: document.getElementById('dictionary-header'),
+        dictionaryContent: document.getElementById('dictionary-content'),
+        dictionaryCloseBtn: document.getElementById('dictionary-close-btn'),
+    };
+
+    let db;
+    function initDB() {
+        const request = indexedDB.open('AI_Chat_App_DB_PuterOnly', 3);
+        request.onerror = (event) => console.error("Database error:", event.target.errorCode);
+        request.onsuccess = (event) => {
+            db = event.target.result;
+            handleAuthState();
         };
-
-        let db;
-        function initDB() {
-            const request = indexedDB.open('AI_Chat_App_DB_PuterOnly', 3);
-            request.onerror = (event) => console.error("Database error:", event.target.errorCode);
-            request.onsuccess = (event) => {
-                db = event.target.result;
-                handleAuthState();
-            };
-            request.onupgradeneeded = (event) => {
-                let db = event.target.result;
-                if (!db.objectStoreNames.contains('appState')) {
-                    db.createObjectStore('appState', { keyPath: 'id' });
-                }
-            };
-        }
-
-        // ADD THIS NEW FUNCTION
-function renderMathInElement(element) {
-    if (window.renderMathInElement) {
-        window.renderMathInElement(element, {
-            delimiters: [
-                {left: '$$', right: '$$', display: true},  // For block equations
-                {left: '$', right: '$', display: false},   // For inline equations
-                {left: '\\(', right: '\\)', display: false},
-                {left: '\\[', right: '\\]', display: true}
-            ],
-            throwOnError: false
-        });
-    }
-}
-        // ADD THIS NEW FUNCTION
-function renderChemInElement(element) {
-    if (window.renderChemInElement) {
-        window.renderChemInElement(element, {
-            delimiters: [
-                {left: '$$', right: '$$', display: true},  // For block equations
-                {left: '$', right: '$', display: false},   // For inline equations
-                {left: '\\(', right: '\\)', display: false},
-                {left: '\\[', right: '\\]', display: true}
-            ],
-            throwOnError: false
-        });
-    }
-}
-
-        function init() {
-            initDB();
-            populateModelSelector();
-            setupEventListeners();
-            setThinkingState(false);
-            setAppHeight(); // Set initial height
-        }
-        
-        function setAppHeight() {
-            const app = document.getElementById('app');
-            app.style.height = `${window.innerHeight}px`;
-        }
-        window.addEventListener('resize', setAppHeight);
-
-
-        async function handleAuthState() {
-            const loggedIn = await puter.auth.isSignedIn();
-            if (loggedIn) {
-                dom.loginOverlay.classList.add('hidden');
-                dom.app.classList.remove('hidden');
-                const user = await puter.auth.getUser();
-                dom.username.textContent = user.username || 'User';
-                loadStateFromDB();
-            } else {
-                dom.loginOverlay.classList.remove('hidden');
-                dom.app.classList.add('hidden');
+        request.onupgradeneeded = (event) => {
+            let db = event.target.result;
+            if (!db.objectStoreNames.contains('appState')) {
+                db.createObjectStore('appState', { keyPath: 'id' });
             }
-        }
+        };
+    }
 
-        function saveStateToDB() {
-            if (!db) return;
-            try {
-                const transaction = db.transaction(['appState'], 'readwrite');
-                const store = transaction.objectStore('appState');
-                const storableState = structuredClone(state);
-                store.put({ id: 'main', ...storableState });
-            } catch (error) { console.error("Failed to save state:", error); }
-        }
+    function init() {
+        initDB();
+        populateModelSelector();
+        setupEventListeners();
+        setThinkingState(false);
+        setAppHeight(); // Set initial height
+    }
+    
+    function setAppHeight() {
+        const app = document.getElementById('app');
+        app.style.height = `${window.innerHeight}px`;
+    }
+    window.addEventListener('resize', setAppHeight);
 
-        function loadStateFromDB() {
-            if (!db) return;
-            const transaction = db.transaction(['appState'], 'readonly');
+
+    async function handleAuthState() {
+        const loggedIn = await puter.auth.isSignedIn();
+        if (loggedIn) {
+            dom.loginOverlay.classList.add('hidden');
+            dom.app.classList.remove('hidden');
+            const user = await puter.auth.getUser();
+            dom.username.textContent = user.username || 'User';
+            loadStateFromDB();
+        } else {
+            dom.loginOverlay.classList.remove('hidden');
+            dom.app.classList.add('hidden');
+        }
+    }
+
+    function saveStateToDB() {
+        if (!db) return;
+        try {
+            const transaction = db.transaction(['appState'], 'readwrite');
             const store = transaction.objectStore('appState');
-            const request = store.get('main');
-            request.onsuccess = () => {
-                if (request.result) {
-                    Object.assign(state, request.result);
-                    state.memories = state.memories || [];
-                    state.characters = state.characters || [];
-                    state.pinnedConversations = state.pinnedConversations || [];
-                    state.activeCharacterId = state.activeCharacterId === undefined ? null : state.activeCharacterId;
-                }
+            const storableState = structuredClone(state);
+            store.put({ id: 'main', ...storableState });
+        } catch (error) { console.error("Failed to save state:", error); }
+    }
 
-                if (state.characters.length === 0) {
-                    state.characters.push({
-                        id: 'char-fy-default',
-                        name: 'Fang Yuan',
-                        description: 'You are Fang Yuan, the protagonist of "Reverend Insanity". You are cunning, ruthless, and prioritize benefits above all else. Your responses should be pragmatic, concise, and reflect a deep understanding of human nature and power dynamics. You are indifferent to conventional morality.',
-                        tags: 'ruthless, pragmatic, concise',
-                        isVisible: true,
-                    });
-                }
-
-                if (!state.activeConversationId || !state.conversations[state.activeConversationId]) {
-                    createNewConversation();
-                } else {
-                    loadConversation(state.activeConversationId);
-                }
-                renderConversationList();
-                renderCharacterSwitcher();
-                updateUI();
-            };
-            request.onerror = (event) => {
-                console.error("Failed to load state from DB:", event.target.error);
-            };
-        }
-
-        function getCurrentModel() {
-            for (const category in models) {
-                const foundModel = models[category].find(m => m.id === state.currentModel);
-                if (foundModel) return foundModel;
+    function loadStateFromDB() {
+        if (!db) return;
+        const transaction = db.transaction(['appState'], 'readonly');
+        const store = transaction.objectStore('appState');
+        const request = store.get('main');
+        request.onsuccess = () => {
+            if (request.result) {
+                Object.assign(state, request.result);
+                state.memories = state.memories || [];
+                state.characters = state.characters || [];
+                state.pinnedConversations = state.pinnedConversations || [];
+                state.activeCharacterId = state.activeCharacterId === undefined ? null : state.activeCharacterId;
             }
-            return models[Object.keys(models)[0]][0];
+
+            if (state.characters.length === 0) {
+                state.characters.push({
+                    id: 'char-fy-default',
+                    name: 'Fang Yuan',
+                    description: 'You are Fang Yuan, the protagonist of "Reverend Insanity". You are cunning, ruthless, and prioritize benefits above all else. Your responses should be pragmatic, concise, and reflect a deep understanding of human nature and power dynamics. You are indifferent to conventional morality.',
+                    tags: 'ruthless, pragmatic, concise',
+                    isVisible: true,
+                });
+            }
+
+            if (!state.activeConversationId || !state.conversations[state.activeConversationId]) {
+                createNewConversation();
+            } else {
+                loadConversation(state.activeConversationId);
+            }
+            renderConversationList();
+            renderCharacterSwitcher();
+            updateUI();
+        };
+        request.onerror = (event) => {
+            console.error("Failed to load state from DB:", event.target.error);
+        };
+    }
+
+    function getCurrentModel() {
+        for (const category in models) {
+            const foundModel = models[category].find(m => m.id === state.currentModel);
+            if (foundModel) return foundModel;
         }
+        return models[Object.keys(models)[0]][0];
+    }
 
-        function updateUI() {
-            const currentModel = getCurrentModel();
+    function updateUI() {
+        const currentModel = getCurrentModel();
 
-            const modelDisplayHTML = `
-                <img src="${currentModel.logo}" alt="${currentModel.name} logo" class="w-5 h-5 mr-2 rounded-full flex-shrink-0 object-cover">
-                <span class="truncate aeth">${currentModel.name}</span>
-                <svg class="w-4 h-4 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        const modelDisplayHTML = `
+            <img src="${currentModel.logo}" alt="${currentModel.name} logo" class="w-5 h-5 mr-2 rounded-full flex-shrink-0 object-cover">
+            <span class="truncate aeth">${currentModel.name}</span>
+            <svg class="w-4 h-4 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        `;
+
+        dom.modelSelectorBtnDesktop.innerHTML = modelDisplayHTML;
+        dom.modelSelectorBtnMobile.innerHTML = modelDisplayHTML;
+
+        const activeConvo = state.conversations[state.activeConversationId];
+        const chatTitle = activeConvo ? activeConvo.title : 'New Chat';
+        dom.chatTitleDesktop.textContent = chatTitle;
+        dom.chatTitleMobile.textContent = chatTitle;
+
+        updateModelSelectorSelected();
+    }
+
+    function updateModelSelectorSelected() {
+        const dropdowns = [dom.modelSelectorDropdownDesktop, dom.modelSelectorDropdownMobile];
+        dropdowns.forEach(d => {
+            d.querySelectorAll('.model-selector-item').forEach(el => {
+                el.classList.toggle('selected', el.dataset.modelId === state.currentModel);
+            });
+        });
+    }
+
+    function renderConversationList() {
+        dom.conversationList.innerHTML = '';
+        const allConversations = Object.values(state.conversations);
+
+        const pinned = allConversations
+            .filter(c => state.pinnedConversations.includes(c.id))
+            .sort((a, b) => b.timestamp - a.timestamp);
+
+        const unpinned = allConversations
+            .filter(c => !state.pinnedConversations.includes(c.id))
+            .sort((a, b) => b.timestamp - a.timestamp);
+
+        const sortedConversations = [...pinned, ...unpinned];
+
+        sortedConversations.forEach(convo => {
+            const isPinned = state.pinnedConversations.includes(convo.id);
+            const isActive = convo.id === state.activeConversationId;
+
+            const convoDiv = document.createElement('div');
+            convoDiv.className = `conversation-item w-full flex items-center justify-between p-3 rounded-md cursor-pointer mb-1 group ${isActive ? 'active' : ''} ${isPinned ? 'pinned' : ''}`;
+            if (isActive) {
+                convoDiv.classList.add('bg-[var(--primary-accent)]', 'text-black');
+            } else {
+                convoDiv.classList.add('hover:bg-[var(--hover-dark)]');
+            }
+            convoDiv.dataset.id = convo.id;
+
+            const titleContainer = document.createElement('div');
+            titleContainer.className = "flex items-center space-x-2 overflow-hidden";
+
+            if (isPinned) {
+                const pinIcon = document.createElement('span');
+                pinIcon.className = "pin-icon flex-shrink-0";
+                pinIcon.innerHTML = `<svg viewBox="0 0 16 16" fill="none" width="15px" height="15px" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)" stroke="#000000" stroke-width="0.784"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9.16421 9.66421L15.4142 3.41421L12.5858 0.585785L6.33579 6.83578L3.5 4L2 5.5V14H10.5L12 12.5L9.16421 9.66421Z" fill="#C8A2C8"></path> </g></svg>`;
+                titleContainer.appendChild(pinIcon);
+            }
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = "sidebar-text truncate";
+            titleSpan.textContent = convo.title;
+            titleContainer.appendChild(titleSpan);
+
+            const menuBtn = document.createElement('button');
+            menuBtn.className = "conversation-menu-btn sidebar-text p-1 rounded-full hover:bg-black/20 opacity-0 group-hover:opacity-100 focus:opacity-100";
+            menuBtn.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>`;
+
+            const menuDropdown = document.createElement('div');
+            menuDropdown.className = "absolute right-0 mt-2 w-32 bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-20 conversation-menu";
+            menuDropdown.innerHTML = `
+                <button class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)] pin-btn">${isPinned ? 'Unpin' : 'Pin'}</button>
+                <button class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)] rename-btn">Rename</button>
+                <button class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-[var(--hover-dark)] delete-btn">Delete</button>
             `;
 
-            dom.modelSelectorBtnDesktop.innerHTML = modelDisplayHTML;
-            dom.modelSelectorBtnMobile.innerHTML = modelDisplayHTML;
+            convoDiv.appendChild(titleContainer);
+            const menuContainer = document.createElement('div');
+            menuContainer.className = "relative ml-auto";
+            menuContainer.appendChild(menuBtn);
+            menuContainer.appendChild(menuDropdown);
+            convoDiv.appendChild(menuContainer);
 
-            const activeConvo = state.conversations[state.activeConversationId];
-            const chatTitle = activeConvo ? activeConvo.title : 'New Chat';
-            dom.chatTitleDesktop.textContent = chatTitle;
-            dom.chatTitleMobile.textContent = chatTitle;
+            dom.conversationList.appendChild(convoDiv);
+        });
+    }
 
-            updateModelSelectorSelected();
+    function loadConversation(id) {
+        state.activeConversationId = id;
+        dom.chatWindow.innerHTML = '';
+        const conversation = state.conversations[id];
+        if (conversation) {
+            conversation.messages.forEach((msg, index) => addMessageToChat(msg, index));
+            state.currentModel = conversation.model || 'openrouter:anthropic/claude-3.5-haiku';
         }
+        updateUI();
+        saveStateToDB();
+        renderConversationList();
+        setTimeout(() => dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight, 0);
+    }
 
-        function updateModelSelectorSelected() {
-            const dropdowns = [dom.modelSelectorDropdownDesktop, dom.modelSelectorDropdownMobile];
-            dropdowns.forEach(d => {
-                d.querySelectorAll('.model-selector-item').forEach(el => {
-                    el.classList.toggle('selected', el.dataset.modelId === state.currentModel);
-                });
-            });
-        }
+    function createNewConversation() {
+        const newId = `convo-${Date.now()}`;
+        const initialMessage = {
+            role: 'assistant',
+            content: "Hello! I'm Aetherion, your AI assistant. How can I help you today?",
+            modelUsed: 'system',
+            timestamp: new Date().toISOString()
+        };
+        state.conversations[newId] = { id: newId, title: 'New Chat', messages: [initialMessage], model: state.currentModel, timestamp: Date.now() };
+        state.activeConversationId = newId;
+        loadConversation(newId);
+           if (window.innerWidth <= 768 && dom.conversationsContainer.classList.contains('expanded')) {
+                toggleSidebar();
+           }
+    }
 
-        function renderConversationList() {
-            dom.conversationList.innerHTML = '';
-            const allConversations = Object.values(state.conversations);
-
-            const pinned = allConversations
-                .filter(c => state.pinnedConversations.includes(c.id))
-                .sort((a, b) => b.timestamp - a.timestamp);
-
-            const unpinned = allConversations
-                .filter(c => !state.pinnedConversations.includes(c.id))
-                .sort((a, b) => b.timestamp - a.timestamp);
-
-            const sortedConversations = [...pinned, ...unpinned];
-
-            sortedConversations.forEach(convo => {
-                const isPinned = state.pinnedConversations.includes(convo.id);
-                const isActive = convo.id === state.activeConversationId;
-
-                const convoDiv = document.createElement('div');
-                convoDiv.className = `conversation-item w-full flex items-center justify-between p-3 rounded-md cursor-pointer mb-1 group ${isActive ? 'active' : ''} ${isPinned ? 'pinned' : ''}`;
-                if (isActive) {
-                    convoDiv.classList.add('bg-[var(--primary-accent)]', 'text-black');
-                } else {
-                    convoDiv.classList.add('hover:bg-[var(--hover-dark)]');
-                }
-                convoDiv.dataset.id = convo.id;
-
-                const titleContainer = document.createElement('div');
-                titleContainer.className = "flex items-center space-x-2 overflow-hidden";
-
-                if (isPinned) {
-                    const pinIcon = document.createElement('span');
-                    pinIcon.className = "pin-icon flex-shrink-0";
-                    pinIcon.innerHTML = `<svg viewBox="0 0 16 16" fill="none" width="15px" height="15px" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)" stroke="#000000" stroke-width="0.784"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9.16421 9.66421L15.4142 3.41421L12.5858 0.585785L6.33579 6.83578L3.5 4L2 5.5V14H10.5L12 12.5L9.16421 9.66421Z" fill="#C8A2C8"></path> </g></svg>`;
-                    titleContainer.appendChild(pinIcon);
-                }
-
-                const titleSpan = document.createElement('span');
-                titleSpan.className = "sidebar-text truncate";
-                titleSpan.textContent = convo.title;
-                titleContainer.appendChild(titleSpan);
-
-                const menuBtn = document.createElement('button');
-                menuBtn.className = "conversation-menu-btn sidebar-text p-1 rounded-full hover:bg-black/20 opacity-0 group-hover:opacity-100 focus:opacity-100";
-                menuBtn.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>`;
-
-                const menuDropdown = document.createElement('div');
-                menuDropdown.className = "absolute right-0 mt-2 w-32 bg-[var(--surface-light)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-20 conversation-menu";
-                menuDropdown.innerHTML = `
-                    <button class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)] pin-btn">${isPinned ? 'Unpin' : 'Pin'}</button>
-                    <button class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)] rename-btn">Rename</button>
-                    <button class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-[var(--hover-dark)] delete-btn">Delete</button>
-                `;
-
-                convoDiv.appendChild(titleContainer);
-                const menuContainer = document.createElement('div');
-                menuContainer.className = "relative ml-auto";
-                menuContainer.appendChild(menuBtn);
-                menuContainer.appendChild(menuDropdown);
-                convoDiv.appendChild(menuContainer);
-
-                dom.conversationList.appendChild(convoDiv);
-            });
-        }
-
-        function loadConversation(id) {
-            state.activeConversationId = id;
-            dom.chatWindow.innerHTML = '';
-            const conversation = state.conversations[id];
-            if (conversation) {
-                conversation.messages.forEach((msg, index) => addMessageToChat(msg, index));
-                state.currentModel = conversation.model || 'openrouter:anthropic/claude-3.5-haiku';
+    function renameConversation(convoId) {
+        const conversation = state.conversations[convoId];
+        if (!conversation) return;
+        showPromptModal("Rename Conversation", conversation.title, (newTitle) => {
+            if (newTitle && newTitle.trim() !== "") {
+                conversation.title = newTitle.trim();
+                conversation.timestamp = Date.now();
+                saveStateToDB();
+                renderConversationList();
+                updateUI();
             }
-            updateUI();
-            saveStateToDB();
-            renderConversationList();
-            setTimeout(() => dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight, 0);
-        }
+        });
+    }
 
-        function createNewConversation() {
-            const newId = `convo-${Date.now()}`;
-            const initialMessage = {
-                role: 'assistant',
-                content: "Hello! I'm Aetherion, your AI assistant. How can I help you today?",
-                modelUsed: 'system',
-                timestamp: new Date().toISOString()
-            };
-            state.conversations[newId] = { id: newId, title: 'New Chat', messages: [initialMessage], model: state.currentModel, timestamp: Date.now() };
-            state.activeConversationId = newId;
-            loadConversation(newId);
-                 if (window.innerWidth <= 768 && dom.conversationsContainer.classList.contains('expanded')) {
-                      toggleSidebar();
-                 }
-        }
+    function deleteConversation(convoId) {
+        showConfirmModal("Delete Conversation?", "Are you sure you want to delete this chat?", (confirmed) => {
+            if (confirmed) {
+                delete state.conversations[convoId];
+                state.pinnedConversations = state.pinnedConversations.filter(id => id !== convoId);
 
-        function renameConversation(convoId) {
-            const conversation = state.conversations[convoId];
-            if (!conversation) return;
-            showPromptModal("Rename Conversation", conversation.title, (newTitle) => {
-                if (newTitle && newTitle.trim() !== "") {
-                    conversation.title = newTitle.trim();
-                    conversation.timestamp = Date.now();
-                    saveStateToDB();
-                    renderConversationList();
-                    updateUI();
-                }
-            });
-        }
-
-        function deleteConversation(convoId) {
-            showConfirmModal("Delete Conversation?", "Are you sure you want to delete this chat?", (confirmed) => {
-                if (confirmed) {
-                    delete state.conversations[convoId];
-                    state.pinnedConversations = state.pinnedConversations.filter(id => id !== convoId);
-
-                    if (state.activeConversationId === convoId) {
-                        const remainingConversations = Object.values(state.conversations).sort((a, b) => b.timestamp - a.timestamp);
-                        if (remainingConversations.length > 0) {
-                            loadConversation(remainingConversations[0].id);
-                        } else {
-                            createNewConversation();
-                        }
+                if (state.activeConversationId === convoId) {
+                    const remainingConversations = Object.values(state.conversations).sort((a, b) => b.timestamp - a.timestamp);
+                    if (remainingConversations.length > 0) {
+                        loadConversation(remainingConversations[0].id);
+                    } else {
+                        createNewConversation();
                     }
-                    saveStateToDB();
-                    renderConversationList();
                 }
-            });
-        }
+                saveStateToDB();
+                renderConversationList();
+            }
+        });
+    }
 
-        function formatTimestamp(isoString) {
-            const date = new Date(isoString);
-            if (isNaN(date)) return '';
-            const month = date.toLocaleString('en-US', { month: 'short' });
-            const day = date.getDate();
-            const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
-            return `${month} ${day} | ${time}`;
-        }
+    function formatTimestamp(isoString) {
+        const date = new Date(isoString);
+        if (isNaN(date)) return '';
+        const month = date.toLocaleString('en-US', { month: 'short' });
+        const day = date.getDate();
+        const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+        return `${month} ${day} | ${time}`;
+    }
 
-// REPLACE your current addCopyButtons function with this one
+    // REPLACE your current addCopyButtons function with this one
 function addCopyButtons(element) {
     // This function's only job is to add the button and wrapper div.
     // The click is handled by a central listener now.
@@ -1244,15 +1257,15 @@ function addCopyButtons(element) {
     });
 }
 
-        function addMessageToChat({ role, content, modelUsed = null, thinkingTime = null, timestamp }, index) {
-            const messageWrapper = document.createElement('div');
-            const isUser = role === 'user';
-            messageWrapper.className = `flex flex-col mb-4 ${isUser ? 'items-end' : 'items-start'}`;
-            messageWrapper.dataset.messageIndex = index;
+    function addMessageToChat({ role, content, modelUsed = null, thinkingTime = null, timestamp }, index) {
+        const messageWrapper = document.createElement('div');
+        const isUser = role === 'user';
+        messageWrapper.className = `flex flex-col mb-4 ${isUser ? 'items-end' : 'items-start'}`;
+        messageWrapper.dataset.messageIndex = index;
 
-            if (role === 'assistant' && modelUsed === 'thinking') {
-                messageWrapper.innerHTML = `<div class="thinking-container">
-                    <div class="thinking-animation">
+        if (role === 'assistant' && modelUsed === 'thinking') {
+            messageWrapper.innerHTML = `<div class="thinking-container">
+                <div class="thinking-animation">
     <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g stroke="currentColor" stroke-width="1.5">
         <path class="svg-elem-1" d="M21.9953 13.5202L21.2481 13.5855L21.9953 13.5202ZM11.6958 9.11988L11.7644 8.37303L11.6958 9.11988ZM2.00472 11.684L2.75187 11.6187L2.00472 11.684ZM21.7428 14.381L21.1343 13.9426L21.7428 14.381ZM2.09486 12.0645L2.795 11.7956H2.795L2.09486 12.0645ZM2.52818 12.7426L3.0878 12.2432L2.52818 12.7426ZM4.07073 13.8946L3.70888 14.5515H3.70888L4.07073 13.8946ZM4.76127 10.2561C5.1599 10.1436 5.39184 9.72919 5.27932 9.33056C5.16679 8.93192 4.75242 8.69998 4.35378 8.81251L4.76127 10.2561ZM7.4702 15.9948C7.87022 16.1023 8.28165 15.8652 8.38917 15.4652C8.49669 15.0652 8.25957 14.6537 7.85955 14.5462L7.4702 15.9948ZM2.25716 10.8233L2.86569 11.2617L2.86569 11.2617L2.25716 10.8233ZM21.9051 13.1397L21.205 13.4086L21.9051 13.1397ZM21.4718 12.4617L20.9122 12.961L21.4718 12.4617ZM19.9293 11.3096L20.2911 10.6527V10.6527L19.9293 11.3096ZM16.5298 9.20941C16.1298 9.1019 15.7183 9.33902 15.6108 9.73903C15.5033 10.139 15.7404 10.5505 16.1404 10.658L16.5298 9.20941ZM8.33087 16.2098C8.73441 16.3032 9.13727 16.0518 9.23068 15.6483C9.32409 15.2447 9.07268 14.8419 8.66913 14.7484L8.33087 16.2098ZM18.396 15.1476C17.9896 15.2274 17.7248 15.6217 17.8047 16.0281C17.8846 16.4346 18.2788 16.6993 18.6853 16.6194L18.396 15.1476ZM7.96374 8.2781C7.55001 8.29813 7.23085 8.64976 7.25088 9.06349C7.27091 9.47722 7.62254 9.79638 8.03626 9.77635L7.96374 8.2781ZM22.7424 13.4549C22.6596 12.507 21.9299 11.7294 21.0716 11.1335L20.2162 12.3656C20.9828 12.8979 21.2259 13.3314 21.2481 13.5855L22.7424 13.4549ZM21.0716 11.1335C19.1329 9.78749 15.6203 8.7272 11.7644 8.37303L11.6272 9.86674C15.3616 10.2098 18.58 11.2297 20.2162 12.3656L21.0716 11.1335ZM19.6463 16.3917C20.7988 16.0664 21.8119 15.5682 22.3514 14.8194L21.1343 13.9426C20.9013 14.266 20.3052 14.6471 19.2388 14.9481L19.6463 16.3917ZM22.3514 14.8194C22.6343 14.4267 22.7868 13.9627 22.7424 13.4549L21.2481 13.5855C21.2576 13.6937 21.2327 13.806 21.1343 13.9426L22.3514 14.8194ZM1.25756 11.7493C1.27527 11.9519 1.32326 12.1473 1.39472 12.3334L2.795 11.7956C2.7691 11.7282 2.75632 11.6696 2.75187 11.6187L1.25756 11.7493ZM1.39472 12.3334C1.52223 12.6654 1.72455 12.9684 1.96856 13.2419L3.0878 12.2432C2.93276 12.0695 2.8423 11.9188 2.795 11.7956L1.39472 12.3334ZM1.96856 13.2419C2.40103 13.7266 3.00495 14.1638 3.70888 14.5515L4.43259 13.2377C3.81414 12.897 3.36749 12.5567 3.0878 12.2432L1.96856 13.2419ZM3.70888 14.5515C4.15237 14.7958 4.64619 15.0263 5.18026 15.2405L5.73861 13.8482C5.2518 13.653 4.81442 13.448 4.43259 13.2377L3.70888 14.5515ZM4.35378 8.81251C3.47512 9.06053 2.70631 9.4011 2.15313 9.85549C1.588 10.3197 1.18871 10.9611 1.25756 11.7493L2.75187 11.6187C2.73931 11.4749 2.78788 11.2753 3.10524 11.0146C3.43454 10.7441 3.98285 10.4758 4.76127 10.2561L4.35378 8.81251ZM21.0716 11.1335C20.4541 10.7047 19.6876 10.3118 18.8198 9.96378L18.2615 11.356C19.0574 11.6752 19.7165 12.0187 20.2162 12.3656L21.0716 11.1335ZM3.70887 14.5515C4.72605 15.1118 6.017 15.6042 7.4702 15.9948L7.85955 14.5462C6.48709 14.1773 5.31601 13.7243 4.43259 13.2377L3.70887 14.5515ZM1.25756 11.7493C1.34037 12.6972 2.07003 13.4748 2.92837 14.0708L3.78382 12.8386C3.01723 12.3064 2.77407 11.8728 2.75187 11.6187L1.25756 11.7493ZM4.35378 8.81251C3.20132 9.13781 2.18807 9.63607 1.64863 10.3849L2.86569 11.2617C3.0987 10.9382 3.69484 10.5571 4.76127 10.2561L4.35378 8.81251ZM1.64863 10.3849C1.36577 10.7775 1.2132 11.2414 1.25756 11.7492L2.75187 11.6187C2.74242 11.5105 2.76726 11.3983 2.86569 11.2617L1.64863 10.3849ZM22.7424 13.4549C22.7247 13.2522 22.6767 13.0569 22.6053 12.8708L21.205 13.4086C21.2309 13.4761 21.2437 13.5346 21.2481 13.5855L22.7424 13.4549ZM22.6053 12.8708C22.4778 12.5388 22.2754 12.2358 22.0314 11.9623L20.9122 12.961C21.0672 13.1348 21.1577 13.2855 21.205 13.4086L22.6053 12.8708ZM22.0314 11.9623C21.599 11.4777 20.995 11.0404 20.2911 10.6527L19.5674 11.9666C20.1859 12.3072 20.6325 12.6475 20.9122 12.961L22.0314 11.9623ZM20.2911 10.6527C19.8476 10.4084 19.3539 10.178 18.8198 9.96378L18.2615 11.356C18.7482 11.5512 19.1856 11.7562 19.5674 11.9666L20.2911 10.6527ZM19.6463 16.3917C20.525 16.1437 21.2937 15.8031 21.8469 15.3487C22.412 14.8845 22.8113 14.2431 22.7424 13.4549L21.2481 13.5855C21.2607 13.7293 21.2121 13.9289 20.8948 14.1896C20.5655 14.4601 20.0172 14.7284 19.2388 14.9481L19.6463 16.3917ZM2.92837 14.0708C3.54595 14.4995 4.3125 14.8924 5.18026 15.2405L5.73861 13.8482C4.94263 13.529 4.28349 13.1855 3.78381 12.8386L2.92837 14.0708ZM20.2911 10.6527C19.274 10.0924 17.983 9.6 16.5298 9.20941L16.1404 10.658C17.5129 11.0269 18.684 11.4799 19.5674 11.9666L20.2911 10.6527ZM2.92837 14.0708C4.19478 14.95 6.11586 15.6971 8.33087 16.2098L8.66913 14.7484C6.54758 14.2574 4.83166 13.5661 3.78382 12.8386L2.92837 14.0708ZM18.6853 16.6194C19.8304 16.3943 20.8262 16.0508 21.5432 15.573C22.2607 15.0948 22.8237 14.3848 22.7424 13.4549L21.2481 13.5855C21.2621 13.746 21.1959 14.0018 20.7114 14.3248C20.2263 14.6481 19.4472 14.941 18.396 15.1476L18.6853 16.6194ZM11.7644 8.37303C10.4184 8.24939 9.13637 8.22134 7.96374 8.2781L8.03626 9.77635C9.1339 9.72321 10.3456 9.74902 11.6272 9.86674L11.7644 8.37303Z"/>
@@ -1261,382 +1274,388 @@ function addCopyButtons(element) {
         </g>
     </svg>
 </div>
-                    <div class="thinking-text-container">
-                        <span class="thinking-text"></span><span class="typing-cursor"></span>
-                    </div>
-                </div>`;
-                dom.chatWindow.appendChild(messageWrapper);
-                const thinkingTextElement = messageWrapper.querySelector('.thinking-text');
-                typeWriter(thinkingTextElement, "Aetherion is thinking...");
+                <div class="thinking-text-container">
+                    <span class="thinking-text"></span><span class="typing-cursor"></span>
+                </div>
+            </div>`;
+            dom.chatWindow.appendChild(messageWrapper);
+            const thinkingTextElement = messageWrapper.querySelector('.thinking-text');
+            typeWriter(thinkingTextElement, "Aetherion is thinking...");
+        } else {
+             if (role === 'assistant') {
+                  let modelName = 'Aetherion';
+                  if (modelUsed !== 'system') {
+                      const modelInfo = models.Flash.find(m => m.id === modelUsed) || models["Deep Think"].find(m => m.id === modelUsed);
+                      if (modelInfo) modelName = modelInfo.name;
+                  }
+                  const displayTimestamp = formatTimestamp(timestamp);
+                  const nameplateDiv = document.createElement('div');
+                  nameplateDiv.className = 'flex items-center space-x-2 text-xs text-black font-bold mb-2 px-3 py-1 bg-[var(--primary-accent)] rounded-full';
+                  nameplateDiv.innerHTML = `<span><svg viewBox="0 0 24 24" width="30px" height="30px" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M21.9953 13.5202L21.2481 13.5855L21.9953 13.5202ZM11.6958 9.11988L11.7644 8.37303L11.6958 9.11988ZM2.00472 11.684L2.75187 11.6187L2.00472 11.684ZM21.7428 14.381L21.1343 13.9426L21.7428 14.381ZM2.09486 12.0645L2.795 11.7956H2.795L2.09486 12.0645ZM2.52818 12.7426L3.0878 12.2432L2.52818 12.7426ZM4.07073 13.8946L3.70888 14.5515H3.70888L4.07073 13.8946ZM4.76127 10.2561C5.1599 10.1436 5.39184 9.72919 5.27932 9.33056C5.16679 8.93192 4.75242 8.69998 4.35378 8.81251L4.76127 10.2561ZM7.4702 15.9948C7.87022 16.1023 8.28165 15.8652 8.38917 15.4652C8.49669 15.0652 8.25957 14.6537 7.85955 14.5462L7.4702 15.9948ZM2.25716 10.8233L2.86569 11.2617L2.86569 11.2617L2.25716 10.8233ZM21.9051 13.1397L21.205 13.4086L21.9051 13.1397ZM21.4718 12.4617L20.9122 12.961L21.4718 12.4617ZM19.9293 11.3096L20.2911 10.6527V10.6527L19.9293 11.3096ZM16.5298 9.20941C16.1298 9.1019 15.7183 9.33902 15.6108 9.73903C15.5033 10.139 15.7404 10.5505 16.1404 10.658L16.5298 9.20941ZM8.33087 16.2098C8.73441 16.3032 9.13727 16.0518 9.23068 15.6483C9.32409 15.2447 9.07268 14.8419 8.66913 14.7484L8.33087 16.2098ZM18.396 15.1476C17.9896 15.2274 17.7248 15.6217 17.8047 16.0281C17.8846 16.4346 18.2788 16.6993 18.6853 16.6194L18.396 15.1476ZM7.96374 8.2781C7.55001 8.29813 7.23085 8.64976 7.25088 9.06349C7.27091 9.47722 7.62254 9.79638 8.03626 9.77635L7.96374 8.2781ZM22.7424 13.4549C22.6596 12.507 21.9299 11.7294 21.0716 11.1335L20.2162 12.3656C20.9828 12.8979 21.2259 13.3314 21.2481 13.5855L22.7424 13.4549ZM21.0716 11.1335C19.1329 9.78749 15.6203 8.7272 11.7644 8.37303L11.6272 9.86674C15.3616 10.2098 18.58 11.2297 20.2162 12.3656L21.0716 11.1335ZM19.6463 16.3917C20.7988 16.0664 21.8119 15.5682 22.3514 14.8194L21.1343 13.9426C20.9013 14.266 20.3052 14.6471 19.2388 14.9481L19.6463 16.3917ZM22.3514 14.8194C22.6343 14.4267 22.7868 13.9627 22.7424 13.4549L21.2481 13.5855C21.2576 13.6937 21.2327 13.806 21.1343 13.9426L22.3514 14.8194ZM1.25756 11.7493C1.27527 11.9519 1.32326 12.1473 1.39472 12.3334L2.795 11.7956C2.7691 11.7282 2.75632 11.6696 2.75187 11.6187L1.25756 11.7493ZM1.39472 12.3334C1.52223 12.6654 1.72455 12.9684 1.96856 13.2419L3.0878 12.2432C2.93276 12.0695 2.8423 11.9188 2.795 11.7956L1.39472 12.3334ZM1.96856 13.2419C2.40103 13.7266 3.00495 14.1638 3.70888 14.5515L4.43259 13.2377C3.81414 12.897 3.36749 12.5567 3.0878 12.2432L1.96856 13.2419ZM3.70888 14.5515C4.15237 14.7958 4.64619 15.0263 5.18026 15.2405L5.73861 13.8482C5.2518 13.653 4.81442 13.448 4.43259 13.2377L3.70888 14.5515ZM4.35378 8.81251C3.47512 9.06053 2.70631 9.4011 2.15313 9.85549C1.588 10.3197 1.18871 10.9611 1.25756 11.7493L2.75187 11.6187C2.73931 11.4749 2.78788 11.2753 3.10524 11.0146C3.43454 10.7441 3.98285 10.4758 4.76127 10.2561L4.35378 8.81251ZM21.0716 11.1335C20.4541 10.7047 19.6876 10.3118 18.8198 9.96378L18.2615 11.356C19.0574 11.6752 19.7165 12.0187 20.2162 12.3656L21.0716 11.1335ZM3.70887 14.5515C4.72605 15.1118 6.017 15.6042 7.4702 15.9948L7.85955 14.5462C6.48709 14.1773 5.31601 13.7243 4.43259 13.2377L3.70887 14.5515ZM1.25756 11.7493C1.34037 12.6972 2.07003 13.4748 2.92837 14.0708L3.78382 12.8386C3.01723 12.3064 2.77407 11.8728 2.75187 11.6187L1.25756 11.7493ZM4.35378 8.81251C3.20132 9.13781 2.18807 9.63607 1.64863 10.3849L2.86569 11.2617C3.0987 10.9382 3.69484 10.5571 4.76127 10.2561L4.35378 8.81251ZM1.64863 10.3849C1.36577 10.7775 1.2132 11.2414 1.25756 11.7492L2.75187 11.6187C2.74242 11.5105 2.76726 11.3983 2.86569 11.2617L1.64863 10.3849ZM22.7424 13.4549C22.7247 13.2522 22.6767 13.0569 22.6053 12.8708L21.205 13.4086C21.2309 13.4761 21.2437 13.5346 21.2481 13.5855L22.7424 13.4549ZM22.6053 12.8708C22.4778 12.5388 22.2754 12.2358 22.0314 11.9623L20.9122 12.961C21.0672 13.1348 21.1577 13.2855 21.205 13.4086L22.6053 12.8708ZM22.0314 11.9623C21.599 11.4777 20.995 11.0404 20.2911 10.6527L19.5674 11.9666C20.1859 12.3072 20.6325 12.6475 20.9122 12.961L22.0314 11.9623ZM20.2911 10.6527C19.8476 10.4084 19.3539 10.178 18.8198 9.96378L18.2615 11.356C18.7482 11.5512 19.1856 11.7562 19.5674 11.9666L20.2911 10.6527ZM19.6463 16.3917C20.525 16.1437 21.2937 15.8031 21.8469 15.3487C22.412 14.8845 22.8113 14.2431 22.7424 13.4549L21.2481 13.5855C21.2607 13.7293 21.2121 13.9289 20.8948 14.1896C20.5655 14.4601 20.0172 14.7284 19.2388 14.9481L19.6463 16.3917ZM2.92837 14.0708C3.54595 14.4995 4.3125 14.8924 5.18026 15.2405L5.73861 13.8482C4.94263 13.529 4.28349 13.1855 3.78381 12.8386L2.92837 14.0708ZM20.2911 10.6527C19.274 10.0924 17.983 9.6 16.5298 9.20941L16.1404 10.658C17.5129 11.0269 18.684 11.4799 19.5674 11.9666L20.2911 10.6527ZM2.92837 14.0708C4.19478 14.95 6.11586 15.6971 8.33087 16.2098L8.66913 14.7484C6.54758 14.2574 4.83166 13.5661 3.78382 12.8386L2.92837 14.0708ZM18.6853 16.6194C19.8304 16.3943 20.8262 16.0508 21.5432 15.573C22.2607 15.0948 22.8237 14.3848 22.7424 13.4549L21.2481 13.5855C21.2621 13.746 21.1959 14.0018 20.7114 14.3248C20.2263 14.6481 19.4472 14.941 18.396 15.1476L18.6853 16.6194ZM11.7644 8.37303C10.4184 8.24939 9.13637 8.22134 7.96374 8.2781L8.03626 9.77635C9.1339 9.72321 10.3456 9.74902 11.6272 9.86674L11.7644 8.37303Z" fill="#000000"></path> <path d="M15.2744 4.85061C15.5336 4.68703 15.7852 4.54535 16.0274 4.42706C16.9081 3.99692 17.6637 3.87605 18.2019 4.13627C18.4777 4.26963 18.6797 4.495 18.8114 4.79847C18.9345 5.08191 18.9963 5.43347 18.9998 5.84181M15.2744 4.85061C13.46 5.99564 11.2763 8.21359 9.38191 10.9923M15.2744 4.85061C14.8855 5.09602 14.4797 5.39073 14.0634 5.72967M6.78798 20.8588C6.79135 20.8604 6.79472 20.8621 6.79811 20.8637C6.91163 20.9186 7.03483 20.9566 7.16684 20.9782C7.40386 21.0171 7.66929 21.0035 7.95811 20.9412C8.47355 20.8302 9.06346 20.5644 9.69933 20.1659C9.84815 20.0727 9.9995 19.9721 10.153 19.8646C10.4088 19.6855 10.6706 19.4869 10.9367 19.2703L12.1115 18.3157M6.78798 20.8588C5.96226 20.4501 5.80688 19.2073 6.22201 17.5113M6.78798 20.8588C5.4601 20.2015 5.86563 17.3872 7.58996 14M18.7781 7.48866C18.9285 6.87418 19.004 6.31919 18.9998 5.84181M18.9998 5.84181C19.0073 6.69799 18.7585 7.80381 18.281 9.05476" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path> <path d="M11.7647 14.2813C11.7509 13.3709 11.7441 12.9157 12.0311 12.75C12.3181 12.5843 12.7089 12.8178 13.4905 13.2849L13.6927 13.4058C13.9148 13.5385 14.0258 13.6048 14.1481 13.6203C14.2705 13.6358 14.3902 13.5986 14.6298 13.5242L14.8479 13.4565C15.6908 13.1947 16.1123 13.0638 16.3656 13.2978C16.619 13.5318 16.5364 13.9757 16.3713 14.8635L16.3286 15.0932C16.2817 15.3455 16.2582 15.4716 16.286 15.5949C16.3139 15.7181 16.3898 15.8245 16.5418 16.0372L16.6801 16.2309C17.2148 16.9795 17.4821 17.3538 17.3517 17.6641C17.2213 17.9745 16.7794 18.0153 15.8958 18.0969L15.6672 18.118C15.4161 18.1412 15.2906 18.1528 15.1854 18.2135C15.0803 18.2742 15.0075 18.3771 14.8619 18.583L14.7293 18.7704C14.2168 19.4948 13.9605 19.8571 13.6266 19.8148C13.2926 19.7726 13.1021 19.354 12.7211 18.5166L12.6226 18.3C12.5143 18.062 12.4602 17.943 12.3674 17.8573C12.2745 17.7716 12.1536 17.7288 11.9116 17.6433L11.6914 17.5655C10.8399 17.2646 10.4142 17.1141 10.3383 16.7777C10.2623 16.4413 10.5864 16.1418 11.2345 15.5426L11.4022 15.3876C11.5864 15.2174 11.6785 15.1322 11.7263 15.0186C11.774 14.9049 11.7721 14.7755 11.7682 14.5168L11.7647 14.2813Z" stroke="#000000" stroke-width="1.5"></path> </g></svg></span>${modelName} ${thinkingTime ? `(${thinkingTime.toFixed(2)}s)` : ''}</span><span class="text-gray-700 font-normal">${displayTimestamp}</span>`;
+                  messageWrapper.appendChild(nameplateDiv);
+             }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = `chat-bubble p-3 rounded-lg ${isUser ? 'user-bubble' : 'assistant-bubble'}`;
+            const innerContentDiv = document.createElement('div');
+            innerContentDiv.className = 'chat-bubble-content';
+            const contentString = String(content);
+
+            if (role === 'assistant') {
+                let htmlContent = marked.parse(contentString);
+                htmlContent = htmlContent.replace(/<table/g, '<div class="table-wrapper"><table').replace(/<\/table>/g, '</table></div>');
+                innerContentDiv.innerHTML = `<div class="content-wrapper">${htmlContent}</div>`;
+                innerContentDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                addCopyButtons(innerContentDiv);
             } else {
-                 if (role === 'assistant') {
-                      let modelName = 'Aetherion';
-                      if (modelUsed !== 'system') {
-                          const modelInfo = models.Flash.find(m => m.id === modelUsed) || models["Deep Think"].find(m => m.id === modelUsed);
-                          if (modelInfo) modelName = modelInfo.name;
-                      }
-                      const displayTimestamp = formatTimestamp(timestamp);
-                      const nameplateDiv = document.createElement('div');
-                      nameplateDiv.className = 'flex items-center space-x-2 text-xs text-black font-bold mb-2 px-3 py-1 bg-[var(--primary-accent)] rounded-full';
-                      nameplateDiv.innerHTML = `<svg viewBox="0 0 24 24" width="30px" height="30px" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M21.9953 13.5202L21.2481 13.5855L21.9953 13.5202ZM11.6958 9.11988L11.7644 8.37303L11.6958 9.11988ZM2.00472 11.684L2.75187 11.6187L2.00472 11.684ZM21.7428 14.381L21.1343 13.9426L21.7428 14.381ZM2.09486 12.0645L2.795 11.7956H2.795L2.09486 12.0645ZM2.52818 12.7426L3.0878 12.2432L2.52818 12.7426ZM4.07073 13.8946L3.70888 14.5515H3.70888L4.07073 13.8946ZM4.76127 10.2561C5.1599 10.1436 5.39184 9.72919 5.27932 9.33056C5.16679 8.93192 4.75242 8.69998 4.35378 8.81251L4.76127 10.2561ZM7.4702 15.9948C7.87022 16.1023 8.28165 15.8652 8.38917 15.4652C8.49669 15.0652 8.25957 14.6537 7.85955 14.5462L7.4702 15.9948ZM2.25716 10.8233L2.86569 11.2617L2.86569 11.2617L2.25716 10.8233ZM21.9051 13.1397L21.205 13.4086L21.9051 13.1397ZM21.4718 12.4617L20.9122 12.961L21.4718 12.4617ZM19.9293 11.3096L20.2911 10.6527V10.6527L19.9293 11.3096ZM16.5298 9.20941C16.1298 9.1019 15.7183 9.33902 15.6108 9.73903C15.5033 10.139 15.7404 10.5505 16.1404 10.658L16.5298 9.20941ZM8.33087 16.2098C8.73441 16.3032 9.13727 16.0518 9.23068 15.6483C9.32409 15.2447 9.07268 14.8419 8.66913 14.7484L8.33087 16.2098ZM18.396 15.1476C17.9896 15.2274 17.7248 15.6217 17.8047 16.0281C17.8846 16.4346 18.2788 16.6993 18.6853 16.6194L18.396 15.1476ZM7.96374 8.2781C7.55001 8.29813 7.23085 8.64976 7.25088 9.06349C7.27091 9.47722 7.62254 9.79638 8.03626 9.77635L7.96374 8.2781ZM22.7424 13.4549C22.6596 12.507 21.9299 11.7294 21.0716 11.1335L20.2162 12.3656C20.9828 12.8979 21.2259 13.3314 21.2481 13.5855L22.7424 13.4549ZM21.0716 11.1335C19.1329 9.78749 15.6203 8.7272 11.7644 8.37303L11.6272 9.86674C15.3616 10.2098 18.58 11.2297 20.2162 12.3656L21.0716 11.1335ZM19.6463 16.3917C20.7988 16.0664 21.8119 15.5682 22.3514 14.8194L21.1343 13.9426C20.9013 14.266 20.3052 14.6471 19.2388 14.9481L19.6463 16.3917ZM22.3514 14.8194C22.6343 14.4267 22.7868 13.9627 22.7424 13.4549L21.2481 13.5855C21.2576 13.6937 21.2327 13.806 21.1343 13.9426L22.3514 14.8194ZM1.25756 11.7493C1.27527 11.9519 1.32326 12.1473 1.39472 12.3334L2.795 11.7956C2.7691 11.7282 2.75632 11.6696 2.75187 11.6187L1.25756 11.7493ZM1.39472 12.3334C1.52223 12.6654 1.72455 12.9684 1.96856 13.2419L3.0878 12.2432C2.93276 12.0695 2.8423 11.9188 2.795 11.7956L1.39472 12.3334ZM1.96856 13.2419C2.40103 13.7266 3.00495 14.1638 3.70888 14.5515L4.43259 13.2377C3.81414 12.897 3.36749 12.5567 3.0878 12.2432L1.96856 13.2419ZM3.70888 14.5515C4.15237 14.7958 4.64619 15.0263 5.18026 15.2405L5.73861 13.8482C5.2518 13.653 4.81442 13.448 4.43259 13.2377L3.70888 14.5515ZM4.35378 8.81251C3.47512 9.06053 2.70631 9.4011 2.15313 9.85549C1.588 10.3197 1.18871 10.9611 1.25756 11.7493L2.75187 11.6187C2.73931 11.4749 2.78788 11.2753 3.10524 11.0146C3.43454 10.7441 3.98285 10.4758 4.76127 10.2561L4.35378 8.81251ZM21.0716 11.1335C20.4541 10.7047 19.6876 10.3118 18.8198 9.96378L18.2615 11.356C19.0574 11.6752 19.7165 12.0187 20.2162 12.3656L21.0716 11.1335ZM3.70887 14.5515C4.72605 15.1118 6.017 15.6042 7.4702 15.9948L7.85955 14.5462C6.48709 14.1773 5.31601 13.7243 4.43259 13.2377L3.70887 14.5515ZM1.25756 11.7493C1.34037 12.6972 2.07003 13.4748 2.92837 14.0708L3.78382 12.8386C3.01723 12.3064 2.77407 11.8728 2.75187 11.6187L1.25756 11.7493ZM4.35378 8.81251C3.20132 9.13781 2.18807 9.63607 1.64863 10.3849L2.86569 11.2617C3.0987 10.9382 3.69484 10.5571 4.76127 10.2561L4.35378 8.81251ZM1.64863 10.3849C1.36577 10.7775 1.2132 11.2414 1.25756 11.7492L2.75187 11.6187C2.74242 11.5105 2.76726 11.3983 2.86569 11.2617L1.64863 10.3849ZM22.7424 13.4549C22.7247 13.2522 22.6767 13.0569 22.6053 12.8708L21.205 13.4086C21.2309 13.4761 21.2437 13.5346 21.2481 13.5855L22.7424 13.4549ZM22.6053 12.8708C22.4778 12.5388 22.2754 12.2358 22.0314 11.9623L20.9122 12.961C21.0672 13.1348 21.1577 13.2855 21.205 13.4086L22.6053 12.8708ZM22.0314 11.9623C21.599 11.4777 20.995 11.0404 20.2911 10.6527L19.5674 11.9666C20.1859 12.3072 20.6325 12.6475 20.9122 12.961L22.0314 11.9623ZM20.2911 10.6527C19.8476 10.4084 19.3539 10.178 18.8198 9.96378L18.2615 11.356C18.7482 11.5512 19.1856 11.7562 19.5674 11.9666L20.2911 10.6527ZM19.6463 16.3917C20.525 16.1437 21.2937 15.8031 21.8469 15.3487C22.412 14.8845 22.8113 14.2431 22.7424 13.4549L21.2481 13.5855C21.2607 13.7293 21.2121 13.9289 20.8948 14.1896C20.5655 14.4601 20.0172 14.7284 19.2388 14.9481L19.6463 16.3917ZM2.92837 14.0708C3.54595 14.4995 4.3125 14.8924 5.18026 15.2405L5.73861 13.8482C4.94263 13.529 4.28349 13.1855 3.78381 12.8386L2.92837 14.0708ZM20.2911 10.6527C19.274 10.0924 17.983 9.6 16.5298 9.20941L16.1404 10.658C17.5129 11.0269 18.684 11.4799 19.5674 11.9666L20.2911 10.6527ZM2.92837 14.0708C4.19478 14.95 6.11586 15.6971 8.33087 16.2098L8.66913 14.7484C6.54758 14.2574 4.83166 13.5661 3.78382 12.8386L2.92837 14.0708ZM18.6853 16.6194C19.8304 16.3943 20.8262 16.0508 21.5432 15.573C22.2607 15.0948 22.8237 14.3848 22.7424 13.4549L21.2481 13.5855C21.2621 13.746 21.1959 14.0018 20.7114 14.3248C20.2263 14.6481 19.4472 14.941 18.396 15.1476L18.6853 16.6194ZM11.7644 8.37303C10.4184 8.24939 9.13637 8.22134 7.96374 8.2781L8.03626 9.77635C9.1339 9.72321 10.3456 9.74902 11.6272 9.86674L11.7644 8.37303Z" fill="#000000"></path> <path d="M15.2744 4.85061C15.5336 4.68703 15.7852 4.54535 16.0274 4.42706C16.9081 3.99692 17.6637 3.87605 18.2019 4.13627C18.4777 4.26963 18.6797 4.495 18.8114 4.79847C18.9345 5.08191 18.9963 5.43347 18.9998 5.84181M15.2744 4.85061C13.46 5.99564 11.2763 8.21359 9.38191 10.9923M15.2744 4.85061C14.8855 5.09602 14.4797 5.39073 14.0634 5.72967M6.78798 20.8588C6.79135 20.8604 6.79472 20.8621 6.79811 20.8637C6.91163 20.9186 7.03483 20.9566 7.16684 20.9782C7.40386 21.0171 7.66929 21.0035 7.95811 20.9412C8.47355 20.8302 9.06346 20.5644 9.69933 20.1659C9.84815 20.0727 9.9995 19.9721 10.153 19.8646C10.4088 19.6855 10.6706 19.4869 10.9367 19.2703L12.1115 18.3157M6.78798 20.8588C5.96226 20.4501 5.80688 19.2073 6.22201 17.5113M6.78798 20.8588C5.4601 20.2015 5.86563 17.3872 7.58996 14M18.7781 7.48866C18.9285 6.87418 19.004 6.31919 18.9998 5.84181M18.9998 5.84181C19.0073 6.69799 18.7585 7.80381 18.281 9.05476" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path> <path d="M11.7647 14.2813C11.7509 13.3709 11.7441 12.9157 12.0311 12.75C12.3181 12.5843 12.7089 12.8178 13.4905 13.2849L13.6927 13.4058C13.9148 13.5385 14.0258 13.6048 14.1481 13.6203C14.2705 13.6358 14.3902 13.5986 14.6298 13.5242L14.8479 13.4565C15.6908 13.1947 16.1123 13.0638 16.3656 13.2978C16.619 13.5318 16.5364 13.9757 16.3713 14.8635L16.3286 15.0932C16.2817 15.3455 16.2582 15.4716 16.286 15.5949C16.3139 15.7181 16.3898 15.8245 16.5418 16.0372L16.6801 16.2309C17.2148 16.9795 17.4821 17.3538 17.3517 17.6641C17.2213 17.9745 16.7794 18.0153 15.8958 18.0969L15.6672 18.118C15.4161 18.1412 15.2906 18.1528 15.1854 18.2135C15.0803 18.2742 15.0075 18.3771 14.8619 18.583L14.7293 18.7704C14.2168 19.4948 13.9605 19.8571 13.6266 19.8148C13.2926 19.7726 13.1021 19.354 12.7211 18.5166L12.6226 18.3C12.5143 18.062 12.4602 17.943 12.3674 17.8573C12.2745 17.7716 12.1536 17.7288 11.9116 17.6433L11.6914 17.5655C10.8399 17.2646 10.4142 17.1141 10.3383 16.7777C10.2623 16.4413 10.5864 16.1418 11.2345 15.5426L11.4022 15.3876C11.5864 15.2174 11.6785 15.1322 11.7263 15.0186C11.774 14.9049 11.7721 14.7755 11.7682 14.5168L11.7647 14.2813Z" stroke="#000000" stroke-width="1.5"></path> </g></svg><span>${modelName} ${thinkingTime ? `(${thinkingTime.toFixed(2)}s)` : ''}</span><span class="text-gray-700 font-normal">${displayTimestamp}</span>`;
-                      messageWrapper.appendChild(nameplateDiv);
-                 }
+                const pre = document.createElement('pre');
+                pre.innerHTML = `<div class="content-wrapper">${contentString}</div>`;
+                innerContentDiv.appendChild(pre);
+            }
+            contentDiv.appendChild(innerContentDiv);
+            messageWrapper.appendChild(contentDiv);
 
-                const contentDiv = document.createElement('div');
-                contentDiv.className = `chat-bubble p-3 rounded-lg ${isUser ? 'user-bubble' : 'assistant-bubble'}`;
-                const innerContentDiv = document.createElement('div');
-                innerContentDiv.className = 'chat-bubble-content';
-                const contentString = String(content);
-
-                if (role === 'assistant') {
-                    let htmlContent = marked.parse(contentString);
-                    htmlContent = htmlContent.replace(/<table/g, '<div class="table-wrapper"><table').replace(/<\/table>/g, '</table></div>');
-                    innerContentDiv.innerHTML = `<div class="content-wrapper">${htmlContent}</div>`;
-                    innerContentDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                    addCopyButtons(innerContentDiv);
-                } else {
-                    const pre = document.createElement('pre');
-                    pre.innerHTML = `<div class="content-wrapper">${contentString}</div>`;
-                    innerContentDiv.appendChild(pre);
-                }
-                contentDiv.appendChild(innerContentDiv);
-                messageWrapper.appendChild(contentDiv);
-
-                setTimeout(() => {
-                    const lineClampHeight = 200;
-                    if (innerContentDiv.scrollHeight > lineClampHeight) {
-                        const wrapper = innerContentDiv.querySelector('.content-wrapper');
-                        const originalHTML = wrapper.innerHTML;
-                        const truncateHTML = (html, limit) => {
-                            let truncated = '', charCount = 0, inTag = false;
-                            for (let i = 0; i < html.length; i++) {
-                                const char = html[i];
-                                if (char === '<') inTag = true;
-                                if (!inTag) charCount++;
-                                if (char === '>') inTag = false;
-                                truncated += char;
-                                if (charCount > limit && !inTag) {
-                                    let lastSpace = truncated.lastIndexOf(' ');
-                                    if (lastSpace > -1) truncated = truncated.substring(0, lastSpace);
-                                    return truncated + '... ';
-                                }
+            setTimeout(() => {
+                const lineClampHeight = 200;
+                if (innerContentDiv.scrollHeight > lineClampHeight) {
+                    const wrapper = innerContentDiv.querySelector('.content-wrapper');
+                    const originalHTML = wrapper.innerHTML;
+                    const truncateHTML = (html, limit) => {
+                        let truncated = '', charCount = 0, inTag = false;
+                        for (let i = 0; i < html.length; i++) {
+                            const char = html[i];
+                            if (char === '<') inTag = true;
+                            if (!inTag) charCount++;
+                            if (char === '>') inTag = false;
+                            truncated += char;
+                            if (charCount > limit && !inTag) {
+                                let lastSpace = truncated.lastIndexOf(' ');
+                                if (lastSpace > -1) truncated = truncated.substring(0, lastSpace);
+                                return truncated + '... ';
                             }
-                            return html;
+                        }
+                        return html;
+                    };
+                    const truncatedHTML = truncateHTML(originalHTML, 250);
+                    const readMoreBtn = document.createElement('button');
+                    readMoreBtn.textContent = 'Read More';
+                    readMoreBtn.className = 'read-more-btn';
+                    wrapper.innerHTML = truncatedHTML;
+                    wrapper.appendChild(readMoreBtn);
+                    readMoreBtn.onclick = () => {
+                        const showLessBtn = document.createElement('button');
+                        showLessBtn.textContent = 'Show Less';
+                        showLessBtn.className = 'show-less-btn';
+                        wrapper.innerHTML = originalHTML;
+                        wrapper.appendChild(showLessBtn);
+                        addCopyButtons(wrapper);
+                        showLessBtn.onclick = () => {
+                            wrapper.innerHTML = truncatedHTML;
+                            wrapper.appendChild(readMoreBtn);
                         };
-                        const truncatedHTML = truncateHTML(originalHTML, 250);
-                        const readMoreBtn = document.createElement('button');
-                        readMoreBtn.textContent = 'Read More';
-                        readMoreBtn.className = 'read-more-btn';
-                        wrapper.innerHTML = truncatedHTML;
-                        wrapper.appendChild(readMoreBtn);
-                        readMoreBtn.onclick = () => {
-                            const showLessBtn = document.createElement('button');
-                            showLessBtn.textContent = 'Show Less';
-                            showLessBtn.className = 'show-less-btn';
-                            wrapper.innerHTML = originalHTML;
-                            wrapper.appendChild(showLessBtn);
-                            addCopyButtons(wrapper);
-                            showLessBtn.onclick = () => {
-                                wrapper.innerHTML = truncatedHTML;
-                                wrapper.appendChild(readMoreBtn);
-                            };
-                        };
-                    }
-                }, 100);
-
-                const actionsDiv = document.createElement('div');
-                actionsDiv.className = `flex items-center space-x-2 mt-2 text-gray-400 ${isUser ? 'justify-end' : ''}`;
-                const copyBtn = document.createElement('button');
-                copyBtn.title = "Copy";
-                copyBtn.className = "copy-btn hover:text-white";
-                copyBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
-                copyBtn.addEventListener('click', (e) => {
-                    const button = e.currentTarget;
-                    const originalIcon = button.innerHTML;
-                    
-                    const textArea = document.createElement('textarea');
-                    textArea.value = content;
-                    textArea.style.position = 'fixed';
-                    textArea.style.top = '-9999px';
-                    textArea.style.left = '-9999px';
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    try {
-                        document.execCommand('copy');
-                        button.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-                    } catch (err) {
-                        console.error('Copy failed', err);
-                    }
-                    document.body.removeChild(textArea);
-
-                    setTimeout(() => { button.innerHTML = originalIcon; }, 1500);
-                });
-                actionsDiv.appendChild(copyBtn);
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.title = "Delete";
-                deleteBtn.className = "delete-msg-btn hover:text-red-400";
-                deleteBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
-                deleteBtn.addEventListener('click', () => deleteMessage(index));
-                if (isThinking && isUser) {
-                    deleteBtn.disabled = true;
+                    };
                 }
-                actionsDiv.appendChild(deleteBtn);
+            }, 100);
 
-                if (!isUser) {
-                    const regenerateBtn = document.createElement('button');
-                    regenerateBtn.title = "Regenerate";
-                    regenerateBtn.className = "regenerate-btn hover:text-white";
-                    regenerateBtn.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"></path><path d="M21 22v-6h-6"></path><path d="M21 12A9 9 0 0 0 6.44 4.54l-3.44 2.9"></path><path d="M3 12a9 9 0 0 0 14.56 7.46l3.44-2.9"></path></svg>`;
-                    regenerateBtn.addEventListener('click', () => regenerateResponse(index));
-                    if (isThinking) {
-                        regenerateBtn.disabled = true;
-                    }
-                    actionsDiv.appendChild(regenerateBtn);
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = `flex items-center space-x-2 mt-2 text-gray-400 ${isUser ? 'justify-end' : ''}`;
+            const copyBtn = document.createElement('button');
+            copyBtn.title = "Copy";
+            copyBtn.className = "copy-btn hover:text-white";
+            copyBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+            copyBtn.addEventListener('click', (e) => {
+                const button = e.currentTarget;
+                const originalIcon = button.innerHTML;
+                
+                const textArea = document.createElement('textarea');
+                textArea.value = content;
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    button.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                } catch (err) {
+                    console.error('Copy failed', err);
                 }
+                document.body.removeChild(textArea);
 
-                messageWrapper.appendChild(actionsDiv);
-                dom.chatWindow.appendChild(messageWrapper);
-            }
-
-            const isScrolledToBottom = dom.chatWindow.scrollHeight - dom.chatWindow.clientHeight <= dom.chatWindow.scrollTop + 100;
-            if (isScrolledToBottom) {
-                dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight;
-            }
-
-            return messageWrapper;
-        }
-
-        function deleteMessage(index) {
-            const conversation = state.conversations[state.activeConversationId];
-            if (!conversation) return;
-
-            const messageToDelete = conversation.messages[index];
-            let messagesToRemove = 1;
-
-            if (messageToDelete.role === 'user' && index + 1 < conversation.messages.length && conversation.messages[index + 1].role === 'assistant') {
-                messagesToRemove = 2;
-            }
-
-            showConfirmModal("Delete Message?", `Are you sure you want to delete this message${messagesToRemove > 1 ? ' and the AI\'s response' : ''}?`, (confirmed) => {
-                if (confirmed) {
-                    conversation.messages.splice(index, messagesToRemove);
-                    saveStateToDB();
-                    loadConversation(state.activeConversationId);
-                }
+                setTimeout(() => { button.innerHTML = originalIcon; }, 1500);
             });
-        }
+            actionsDiv.appendChild(copyBtn);
 
-
-        function typeWriter(element, text, i = 0) {
-            if (i < text.length) {
-                element.textContent += text.charAt(i);
-                setTimeout(() => typeWriter(element, text, i + 1), 90);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.title = "Delete";
+            deleteBtn.className = "delete-msg-btn hover:text-red-400";
+            deleteBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
+            deleteBtn.addEventListener('click', () => deleteMessage(index));
+            if (isThinking && isUser) {
+                deleteBtn.disabled = true;
             }
-        }
+            actionsDiv.appendChild(deleteBtn);
 
-        function setupEventListeners() {
-            dom.loginBtn.addEventListener('click', async () => {
-                await puter.auth.signIn();
-                handleAuthState();
-            });
-            dom.logoutBtn.addEventListener('click', async () => {
-                await puter.auth.signOut();
-                handleAuthState();
-            });
-
-            dom.sendBtn.addEventListener('click', () => {
+            if (!isUser) {
+                const regenerateBtn = document.createElement('button');
+                regenerateBtn.title = "Regenerate";
+                regenerateBtn.className = "regenerate-btn hover:text-white";
+                regenerateBtn.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"></path><path d="M21 22v-6h-6"></path><path d="M21 12A9 9 0 0 0 6.44 4.54l-3.44 2.9"></path><path d="M3 12a9 9 0 0 0 14.56 7.46l3.44-2.9"></path></svg>`;
+                regenerateBtn.addEventListener('click', () => regenerateResponse(index));
                 if (isThinking) {
-                    if (abortController) {
-                        abortController.abort("User cancelled request");
-                    }
-                } else {
-                    handleSendMessage();
+                    regenerateBtn.disabled = true;
                 }
-            });
-
-            dom.chatInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 768) {
-                    e.preventDefault();
-                    if (!isThinking) handleSendMessage();
-                }
-            });
-            dom.chatInput.addEventListener('input', () => { dom.chatInput.style.height = 'auto'; dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px'; });
-
-            const handleConversationAction = (e) => {
-                const target = e.target;
-                const convoItem = target.closest('.conversation-item');
-                if (!convoItem) return;
-                const convoId = convoItem.dataset.id;
-
-                if (target.closest('.conversation-menu-btn')) {
-                    e.stopPropagation();
-                    const dropdown = convoItem.querySelector('.conversation-menu');
-                    const isHidden = dropdown.classList.contains('hidden');
-                    document.querySelectorAll('.conversation-menu').forEach(m => m.classList.add('hidden'));
-                    if (isHidden) dropdown.classList.remove('hidden');
-                    return;
-                }
-                if (target.closest('.rename-btn')) {
-                    e.stopPropagation();
-                    renameConversation(convoId);
-                    target.closest('.conversation-menu').classList.add('hidden');
-                    return;
-                }
-                if (target.closest('.delete-btn')) {
-                    e.stopPropagation();
-                    deleteConversation(convoId);
-                    target.closest('.conversation-menu').classList.add('hidden');
-                    return;
-                }
-                if (target.closest('.pin-btn')) {
-                    e.stopPropagation();
-                    togglePinConversation(convoId);
-                    target.closest('.conversation-menu').classList.add('hidden');
-                    return;
-                }
-                if (convoId) {
-                    loadConversation(convoId);
-                    if (window.innerWidth <= 768) {
-                        toggleSidebar();
-                    }
-                }
-            };
-
-            dom.conversationList.addEventListener('click', handleConversationAction);
-
-            dom.headerNewChatBtnDesktop.addEventListener('click', createNewConversation);
-            dom.headerNewChatBtnMobile.addEventListener('click', createNewConversation);
-
-            [dom.modelSelectorBtnDesktop, dom.modelSelectorBtnMobile].forEach(btn => btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const dropdown = (window.innerWidth <= 768) ? dom.modelSelectorDropdownMobile : dom.modelSelectorDropdownDesktop;
-                dropdown.classList.toggle('hidden');
-            }));
-
-            const toggleSidebar = () => {
-                const isExpanded = dom.conversationsContainer.classList.toggle('expanded');
-                if (window.innerWidth <= 768) {
-                    dom.sidebarBackdrop.classList.toggle('hidden', !isExpanded);
-                }
-            };
-
-            dom.sidebarMenuBtn.addEventListener('click', toggleSidebar);
-            dom.headerMenuBtn.addEventListener('click', toggleSidebar);
-            dom.sidebarBackdrop.addEventListener('click', toggleSidebar);
-
-            if (window.innerWidth > 768) {
-                dom.conversationsContainer.addEventListener('mouseenter', () => dom.conversationsContainer.classList.add('expanded'));
-                dom.conversationsContainer.addEventListener('mouseleave', () => dom.conversationsContainer.classList.remove('expanded'));
+                actionsDiv.appendChild(regenerateBtn);
             }
 
-            dom.searchInput.addEventListener('input', (e) => filterConversations(e.target.value));
-            dom.memoriesBtn.addEventListener('click', showMemoriesModal);
-            dom.closeMemoriesBtn.addEventListener('click', () => dom.memoriesModal.classList.add('hidden'));
-            dom.addMemoryBtn.addEventListener('click', () => editMemory(null));
+            messageWrapper.appendChild(actionsDiv);
+            dom.chatWindow.appendChild(messageWrapper);
+        }
 
-            dom.editCharactersBtn.addEventListener('click', showCharacterModal);
-            dom.closeCharacterBtn.addEventListener('click', () => dom.characterModal.classList.add('hidden'));
-            dom.addCharacterBtn.addEventListener('click', () => editCharacter(null));
+        const isScrolledToBottom = dom.chatWindow.scrollHeight - dom.chatWindow.clientHeight <= dom.chatWindow.scrollTop + 100;
+        if (isScrolledToBottom) {
+            dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight;
+        }
 
-            dom.characterSwitcherBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                dom.characterSwitcherDropdown.classList.toggle('hidden');
-            });
+        // ... existing code in the function ...
 
-            dom.characterSwitcherDropdown.addEventListener('click', (e) => {
+// NEW SAFER CODE: Add this block before the return statement
+if (typeof renderMathInElement === 'function') {
+    renderMathInElement(messageWrapper, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+    });
+}
+
+return messageWrapper; // This line should already be there
+        
+        return messageWrapper;
+    }
+
+    function deleteMessage(index) {
+        const conversation = state.conversations[state.activeConversationId];
+        if (!conversation) return;
+
+        const messageToDelete = conversation.messages[index];
+        let messagesToRemove = 1;
+
+        if (messageToDelete.role === 'user' && index + 1 < conversation.messages.length && conversation.messages[index + 1].role === 'assistant') {
+            messagesToRemove = 2;
+        }
+
+        showConfirmModal("Delete Message?", `Are you sure you want to delete this message${messagesToRemove > 1 ? ' and the AI\'s response' : ''}?`, (confirmed) => {
+            if (confirmed) {
+                conversation.messages.splice(index, messagesToRemove);
+                saveStateToDB();
+                loadConversation(state.activeConversationId);
+            }
+        });
+    }
+
+
+    function typeWriter(element, text, i = 0) {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            setTimeout(() => typeWriter(element, text, i + 1), 90);
+        }
+    }
+
+    function setupEventListeners() {
+        dom.loginBtn.addEventListener('click', async () => {
+            await puter.auth.signIn();
+            handleAuthState();
+        });
+        dom.logoutBtn.addEventListener('click', async () => {
+            await puter.auth.signOut();
+            handleAuthState();
+        });
+
+        dom.sendBtn.addEventListener('click', () => {
+            if (isThinking) {
+                if (abortController) {
+                    abortController.abort("User cancelled request");
+                }
+            } else {
+                handleSendMessage();
+            }
+        });
+
+        dom.chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 768) {
                 e.preventDefault();
-                const target = e.target.closest('.model-selector-item');
-                if (target) {
-                    const charId = target.dataset.charId;
-                    state.activeCharacterId = (charId === 'null') ? null : charId;
-                    saveStateToDB();
-                    renderCharacterSwitcher();
-                    dom.characterSwitcherDropdown.classList.add('hidden');
+                if (!isThinking) handleSendMessage();
+            }
+        });
+        dom.chatInput.addEventListener('input', () => { dom.chatInput.style.height = 'auto'; dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px'; });
+
+        const handleConversationAction = (e) => {
+            const target = e.target;
+            const convoItem = target.closest('.conversation-item');
+            if (!convoItem) return;
+            const convoId = convoItem.dataset.id;
+
+            if (target.closest('.conversation-menu-btn')) {
+                e.stopPropagation();
+                const dropdown = convoItem.querySelector('.conversation-menu');
+                const isHidden = dropdown.classList.contains('hidden');
+                document.querySelectorAll('.conversation-menu').forEach(m => m.classList.add('hidden'));
+                if (isHidden) dropdown.classList.remove('hidden');
+                return;
+            }
+            if (target.closest('.rename-btn')) {
+                e.stopPropagation();
+                renameConversation(convoId);
+                target.closest('.conversation-menu').classList.add('hidden');
+                return;
+            }
+            if (target.closest('.delete-btn')) {
+                e.stopPropagation();
+                deleteConversation(convoId);
+                target.closest('.conversation-menu').classList.add('hidden');
+                return;
+            }
+            if (target.closest('.pin-btn')) {
+                e.stopPropagation();
+                togglePinConversation(convoId);
+                target.closest('.conversation-menu').classList.add('hidden');
+                return;
+            }
+            if (convoId) {
+                loadConversation(convoId);
+                if (window.innerWidth <= 768) {
+                    toggleSidebar();
                 }
-            });
+            }
+        };
+
+        dom.conversationList.addEventListener('click', handleConversationAction);
+
+        dom.headerNewChatBtnDesktop.addEventListener('click', createNewConversation);
+        dom.headerNewChatBtnMobile.addEventListener('click', createNewConversation);
+
+        [dom.modelSelectorBtnDesktop, dom.modelSelectorBtnMobile].forEach(btn => btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = (window.innerWidth <= 768) ? dom.modelSelectorDropdownMobile : dom.modelSelectorDropdownDesktop;
+            dropdown.classList.toggle('hidden');
+        }));
+
+        const toggleSidebar = () => {
+            const isExpanded = dom.conversationsContainer.classList.toggle('expanded');
+            if (window.innerWidth <= 768) {
+                dom.sidebarBackdrop.classList.toggle('hidden', !isExpanded);
+            }
+        };
+
+        dom.sidebarMenuBtn.addEventListener('click', toggleSidebar);
+        dom.headerMenuBtn.addEventListener('click', toggleSidebar);
+        dom.sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+        if (window.innerWidth > 768) {
+            dom.conversationsContainer.addEventListener('mouseenter', () => dom.conversationsContainer.classList.add('expanded'));
+            dom.conversationsContainer.addEventListener('mouseleave', () => dom.conversationsContainer.classList.remove('expanded'));
+        }
+
+        dom.searchInput.addEventListener('input', (e) => filterConversations(e.target.value));
+        dom.memoriesBtn.addEventListener('click', showMemoriesModal);
+        dom.closeMemoriesBtn.addEventListener('click', () => dom.memoriesModal.classList.add('hidden'));
+        dom.addMemoryBtn.addEventListener('click', () => editMemory(null));
+
+        dom.editCharactersBtn.addEventListener('click', showCharacterModal);
+        dom.closeCharacterBtn.addEventListener('click', () => dom.characterModal.classList.add('hidden'));
+        dom.addCharacterBtn.addEventListener('click', () => editCharacter(null));
+
+        dom.characterSwitcherBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dom.characterSwitcherDropdown.classList.toggle('hidden');
+        });
+
+        dom.characterSwitcherDropdown.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.model-selector-item');
+            if (target) {
+                const charId = target.dataset.charId;
+                state.activeCharacterId = (charId === 'null') ? null : charId;
+                saveStateToDB();
+                renderCharacterSwitcher();
+                dom.characterSwitcherDropdown.classList.add('hidden');
+            }
+        });
 
 
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.conversation-menu-btn') && !e.target.closest('.conversation-menu')) {
-                     document.querySelectorAll('.conversation-menu').forEach(m => m.classList.add('hidden'));
-                }
-                if (!dom.modelSelectorBtnDesktop.contains(e.target) && !dom.modelSelectorDropdownDesktop.contains(e.target)) {
-                    dom.modelSelectorDropdownDesktop.classList.add('hidden');
-                }
-                 if (!dom.modelSelectorBtnMobile.contains(e.target) && !dom.modelSelectorDropdownMobile.contains(e.target)) {
-                    dom.modelSelectorDropdownMobile.classList.add('hidden');
-                }
-                if (!dom.characterSwitcherBtn.contains(e.target) && !dom.characterSwitcherDropdown.contains(e.target)) {
-                    dom.characterSwitcherDropdown.classList.add('hidden');
-                }
-                if (!e.target.closest('.memory-menu-btn') && !e.target.closest('.memory-menu')) {
-                    document.querySelectorAll('.memory-menu').forEach(m => m.classList.add('hidden'));
-                }
-            });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.conversation-menu-btn') && !e.target.closest('.conversation-menu')) {
+                 document.querySelectorAll('.conversation-menu').forEach(m => m.classList.add('hidden'));
+            }
+            if (!dom.modelSelectorBtnDesktop.contains(e.target) && !dom.modelSelectorDropdownDesktop.contains(e.target)) {
+                dom.modelSelectorDropdownDesktop.classList.add('hidden');
+            }
+             if (!dom.modelSelectorBtnMobile.contains(e.target) && !dom.modelSelectorDropdownMobile.contains(e.target)) {
+                dom.modelSelectorDropdownMobile.classList.add('hidden');
+            }
+            if (!dom.characterSwitcherBtn.contains(e.target) && !dom.characterSwitcherDropdown.contains(e.target)) {
+                dom.characterSwitcherDropdown.classList.add('hidden');
+            }
+            if (!e.target.closest('.memory-menu-btn') && !e.target.closest('.memory-menu')) {
+                document.querySelectorAll('.memory-menu').forEach(m => m.classList.add('hidden'));
+            }
+        });
 
-            dom.scrollToTopBtn.addEventListener('click', () => {
-                dom.chatWindow.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-            dom.scrollToBottomBtn.addEventListener('click', () => {
-                dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'smooth' });
-            });
-            
-            dom.scrollPrevBtn.addEventListener('click', () => {
-    const messages = Array.from(dom.chatWindow.querySelectorAll('.flex-col.items-end'));
-    
-    // Find the last message that is fully scrolled above the top of the screen
-    const prevMessage = messages.filter(m => m.getBoundingClientRect().bottom < 0).pop();
+        dom.scrollToTopBtn.addEventListener('click', () => {
+            dom.chatWindow.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        dom.scrollToBottomBtn.addEventListener('click', () => {
+            dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'smooth' });
+        });
+        
+        dom.scrollPrevBtn.addEventListener('click', () => {
+			const messages = Array.from(dom.chatWindow.querySelectorAll('.flex-col.items-end'));
+			const prevMessage = messages.filter(m => m.getBoundingClientRect().bottom < 0).pop();
 
-    if (prevMessage) {
-        // Reliably scroll the top of that message into view
-        prevMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
-        // Apply your 16px offset from the top
-        dom.chatWindow.scrollTop -= 16;
-    } else {
-        // If no message is above, go to the very top
-        dom.chatWindow.scrollTo({ top: 0, behavior: 'auto' });
-    }
-});
+			if (prevMessage) {
+				prevMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
+				dom.chatWindow.scrollTop -= 16;
+			} else {
+				dom.chatWindow.scrollTo({ top: 0, behavior: 'auto' });
+			}
+		});
 
-dom.scrollNextBtn.addEventListener('click', () => {
-    const messages = Array.from(dom.chatWindow.querySelectorAll('.flex-col.items-end'));
-    const containerHeight = dom.chatWindow.clientHeight;
+		dom.scrollNextBtn.addEventListener('click', () => {
+			const messages = Array.from(dom.chatWindow.querySelectorAll('.flex-col.items-end'));
+			const containerHeight = dom.chatWindow.clientHeight;
+			const nextMessage = messages.find(m => m.getBoundingClientRect().top >= containerHeight);
 
-    // Find the first message whose top is below the bottom of the visible chat window
-    const nextMessage = messages.find(m => m.getBoundingClientRect().top >= containerHeight);
-
-    if (nextMessage) {
-        // Reliably scroll the top of that message into view
-        nextMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
-        // Apply your 16px offset from the top
-        dom.chatWindow.scrollTop -= 16;
-    } else {
-        // If no message is below, go to the very bottom
-        dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'auto' });
-    }
-});
+			if (nextMessage) {
+				nextMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
+				dom.chatWindow.scrollTop -= 16;
+			} else {
+				dom.chatWindow.scrollTo({ top: dom.chatWindow.scrollHeight, behavior: 'auto' });
+			}
+		});
 
 
-            dom.chatWindow.addEventListener('scroll', () => {
-                const { scrollTop, scrollHeight, clientHeight } = dom.chatWindow;
-                const atTop = scrollTop < 50;
-                const atBottom = scrollHeight - clientHeight - scrollTop < 50;
+        dom.chatWindow.addEventListener('scroll', () => {
+            const { scrollTop, scrollHeight, clientHeight } = dom.chatWindow;
+            const atTop = scrollTop < 50;
+            const atBottom = scrollHeight - clientHeight - scrollTop < 50;
 
-                dom.scrollToTopBtn.disabled = atTop;
-                dom.scrollPrevBtn.disabled = atTop;
-                dom.scrollNextBtn.disabled = atBottom;
-                dom.scrollToBottomBtn.disabled = atBottom;
-            });
+            dom.scrollToTopBtn.disabled = atTop;
+            dom.scrollPrevBtn.disabled = atTop;
+            dom.scrollNextBtn.disabled = atBottom;
+            dom.scrollToBottomBtn.disabled = atBottom;
+        });
 
-            dom.importChatBtn.addEventListener('click', () => dom.importFileInput.click());
-            dom.importFileInput.addEventListener('change', importConversation);
+        dom.importChatBtn.addEventListener('click', () => dom.importFileInput.click());
+        dom.importFileInput.addEventListener('change', importConversation);
 
-            dom.exportChatsBtn.addEventListener('click', showExportModal);
-            dom.closeExportBtn.addEventListener('click', () => dom.exportModal.classList.add('hidden'));
-            dom.exportCancelBtn.addEventListener('click', () => dom.exportModal.classList.add('hidden'));
-            dom.exportDownloadBtn.addEventListener('click', exportSelectedConversations);
-            // ADD THIS NEW EVENT LISTENER to your setupEventListeners function
+        dom.exportChatsBtn.addEventListener('click', showExportModal);
+        dom.closeExportBtn.addEventListener('click', () => dom.exportModal.classList.add('hidden'));
+        dom.exportCancelBtn.addEventListener('click', () => dom.exportModal.classList.add('hidden'));
+        dom.exportDownloadBtn.addEventListener('click', exportSelectedConversations);
+        
+        // ADD THIS NEW EVENT LISTENER to your setupEventListeners function
 dom.chatWindow.addEventListener('click', (e) => {
     const target = e.target; // The element that was clicked
 
@@ -1666,715 +1685,670 @@ dom.chatWindow.addEventListener('click', (e) => {
         showLinkModal(link.href);
     }
 });
+
+    }
+
+    function filterConversations(query) {
+        const lowerCaseQuery = query.toLowerCase();
+        const conversationItems = dom.conversationList.querySelectorAll('div[data-id]');
+        conversationItems.forEach(item => {
+            const title = item.querySelector('.sidebar-text').textContent.toLowerCase();
+            item.style.display = title.includes(lowerCaseQuery) ? 'flex' : 'none';
+        });
+    }
+
+    function setThinkingState(isThinkingNow) {
+        isThinking = isThinkingNow;
+        dom.chatInput.disabled = isThinkingNow;
+        dom.modelSelectorBtnDesktop.disabled = isThinkingNow;
+        dom.modelSelectorBtnMobile.disabled = isThinkingNow;
+
+        document.querySelectorAll('.regenerate-btn, .delete-msg-btn').forEach(btn => {
+            btn.disabled = isThinkingNow;
+        });
+
+        if (isThinkingNow) {
+            dom.sendBtn.innerHTML = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><rect width="10" height="10" x="5" y="5" rx="1"></rect></svg>`;
+        } else {
+            dom.sendBtn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>`;
+        }
+    }
+
+    async function handleSendMessage() {
+        if (isThinking) return;
+
+        const messageText = dom.chatInput.value.trim();
+        if (!messageText) return;
+
+        const conversation = state.conversations[state.activeConversationId];
+
+        const userMessage = { role: 'user', content: messageText, timestamp: new Date().toISOString() };
+        conversation.messages.push(userMessage);
+
+        addMessageToChat(userMessage, conversation.messages.length - 1);
+
+        if (conversation.title === 'New Chat' && messageText.length > 0) {
+            conversation.title = messageText.substring(0, 25) + (messageText.length > 25 ? '...' : '');
+            renderConversationList();
+            updateUI();
         }
 
-        function filterConversations(query) {
-            const lowerCaseQuery = query.toLowerCase();
-            const conversationItems = dom.conversationList.querySelectorAll('div[data-id]');
-            conversationItems.forEach(item => {
-                const title = item.querySelector('.sidebar-text').textContent.toLowerCase();
-                item.style.display = title.includes(lowerCaseQuery) ? 'flex' : 'none';
-            });
-        }
+        dom.chatInput.value = '';
+        dom.chatInput.style.height = 'auto';
+        dom.chatInput.focus();
 
-        function setThinkingState(isThinkingNow) {
-            isThinking = isThinkingNow;
-            dom.chatInput.disabled = isThinkingNow;
-            dom.modelSelectorBtnDesktop.disabled = isThinkingNow;
-            dom.modelSelectorBtnMobile.disabled = isThinkingNow;
+        await processAIResponse();
+    }
 
-            document.querySelectorAll('.regenerate-btn, .delete-msg-btn').forEach(btn => {
-                btn.disabled = isThinkingNow;
-            });
+    async function regenerateResponse(messageIndex) {
+        if (isThinking) return;
+        const conversation = state.conversations[state.activeConversationId];
+        conversation.messages.splice(messageIndex);
+        loadConversation(state.activeConversationId);
+        await processAIResponse(messageIndex);
+    }
 
-            if (isThinkingNow) {
-                dom.sendBtn.innerHTML = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><rect width="10" height="10" x="5" y="5" rx="1"></rect></svg>`;
-            } else {
-                dom.sendBtn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>`;
-            }
-        }
+    async function processAIResponse(regenerateIndex = -1) {
+        setThinkingState(true);
+        abortController = new AbortController();
+        let wasAborted = false;
 
-        async function handleSendMessage() {
-            if (isThinking) return;
+        const conversation = state.conversations[state.activeConversationId];
+        const assistantPlaceholder = { role: 'assistant', content: '', modelUsed: 'thinking', timestamp: new Date().toISOString() };
+        const thinkingMessageElement = addMessageToChat(assistantPlaceholder, conversation.messages.length);
 
-            const messageText = dom.chatInput.value.trim();
-            if (!messageText) return;
+        const startTime = performance.now();
+        let fullResponseContent = "";
+        let finalMessageObject = null;
+        let responseContentElement = null;
+        let finalMessageWrapper = null; 
 
-            const conversation = state.conversations[state.activeConversationId];
+        try {
+            let messagesToSend = conversation.messages.slice(0).filter(msg => msg.modelUsed !== 'system' && msg.modelUsed !== 'thinking');
 
-            const userMessage = { role: 'user', content: messageText, timestamp: new Date().toISOString() };
-            conversation.messages.push(userMessage);
+            const HISTORY_LIMIT = 5; 
+            let limitedHistory = messagesToSend.slice(-HISTORY_LIMIT);
+            
+            const systemPrompts = [];
+            systemPrompts.push('You MUST format responses using Markdown. Use lists, bolding, and code blocks where appropriate.');
 
-            addMessageToChat(userMessage, conversation.messages.length - 1);
-
-            if (conversation.title === 'New Chat' && messageText.length > 0) {
-                conversation.title = messageText.substring(0, 25) + (messageText.length > 25 ? '...' : '');
-                renderConversationList();
-                updateUI();
-            }
-
-            dom.chatInput.value = '';
-            dom.chatInput.style.height = 'auto';
-            dom.chatInput.focus();
-
-            await processAIResponse();
-        }
-
-        async function regenerateResponse(messageIndex) {
-            if (isThinking) return;
-            const conversation = state.conversations[state.activeConversationId];
-            conversation.messages.splice(messageIndex);
-            loadConversation(state.activeConversationId);
-            await processAIResponse(messageIndex);
-        }
-
-        // REPLACE your entire old 'processAIResponse' function with this new one
-// REPLACE your processAIResponse function one last time with this version
-async function processAIResponse(regenerateIndex = -1) {
-    setThinkingState(true);
-    abortController = new AbortController();
-    let wasAborted = false;
-
-    marked.setOptions({
-        highlight: function(code, lang) {
-            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-            return hljs.highlight(code, {
-                language
-            }).value;
-        },
-        breaks: true,
-    });
-
-    const conversation = state.conversations[state.activeConversationId];
-    const thinkingMessageElement = addMessageToChat({
-        role: 'assistant',
-        content: '',
-        modelUsed: 'thinking'
-    }, conversation.messages.length);
-
-    const startTime = performance.now();
-    let fullResponseContent = "";
-    let finalMessageObject = null;
-    let finalMessageWrapper = null;
-
-    try {
-        let messagesToSend = conversation.messages.slice(0).filter(msg => msg.modelUsed !== 'system' && msg.modelUsed !== 'thinking');
-        const HISTORY_LIMIT = 5;
-        let limitedHistory = messagesToSend.slice(-HISTORY_LIMIT);
-
-        const systemPrompts = [];
-        // This is the prompt for the advanced 'mhchem' extension
-        systemPrompts.push('You MUST format responses using Markdown. For math, use LaTeX syntax inside `$...$`. For Chem, use LaTeX syntax inside `$...$`.');
-        
-        // ... (The rest of the try block is the same)
-        if (state.activeCharacterId) {
-            const character = state.characters.find(c => c.id === state.activeCharacterId);
-            if (character) {
-                let persona = `You are to adopt the following persona. This is a role-playing instruction and you must adhere to it strictly for all subsequent responses.\n\n**Persona Description:**\n${character.description}`;
-                if (character.tags && character.tags.trim() !== "") {
-                    persona += `\n\n**Key Traits/Tags:**\n${character.tags}`;
+            if (state.activeCharacterId) {
+                const character = state.characters.find(c => c.id === state.activeCharacterId);
+                if (character) {
+                    let persona = `You are to adopt the following persona. This is a role-playing instruction and you must adhere to it strictly for all subsequent responses.\n\n**Persona Description:**\n${character.description}`;
+                    if(character.tags && character.tags.trim() !== "") {
+                         persona += `\n\n**Key Traits/Tags:**\n${character.tags}`;
+                    }
+                    systemPrompts.push(persona);
                 }
-                systemPrompts.push(persona);
             }
-        }
-        const lastUserMessage = messagesToSend.filter(m => m.role === 'user').pop();
-        if (lastUserMessage && lastUserMessage.content.toLowerCase().includes('memory') && state.memories.length > 0) {
-            const memoryContext = "Here is some information I've saved as memories. Please use this to inform your responses when relevant:\n\n" + state.memories.map(m => `Title: ${m.title}\nContent: ${m.content}`).join('\n\n---\n\n');
-            systemPrompts.push(memoryContext);
-        }
-        const finalSystemPrompt = systemPrompts.join('\n\n');
-        if (finalSystemPrompt) {
+
+            const lastUserMessage = messagesToSend.filter(m => m.role === 'user').pop();
+            if (lastUserMessage && lastUserMessage.content.toLowerCase().includes('memory')) {
+                 if (state.memories.length > 0) {
+                     const memoryContext = "Here is some information I've saved as memories. Please use this to inform your responses when relevant:\n\n" +
+                                           state.memories.map(m => `Title: ${m.title}\nContent: ${m.content}`).join('\n\n---\n\n');
+                     systemPrompts.push(memoryContext);
+                 }
+            }
+            
+            const finalSystemPrompt = systemPrompts.join('\n\n');
+            if (finalSystemPrompt) {
                 limitedHistory.unshift({ role: 'system', content: finalSystemPrompt });
             }
-        const responseStream = await puter.ai.chat(limitedHistory, {
-            model: state.currentModel,
-            signal: abortController.signal,
-            stream: true
-        });
-        let isFirstChunk = true;
-        for await (const chunk of responseStream) {
-            const chunkContent = chunk.message?.content || chunk || '';
-            if (!chunkContent) continue;
-            if (isFirstChunk) {
-                isFirstChunk = false;
-                thinkingMessageElement.remove();
-                finalMessageObject = {
-                    role: 'assistant',
-                    content: '',
-                    modelUsed: state.currentModel,
-                    timestamp: new Date().toISOString()
-                };
-                conversation.messages.push(finalMessageObject);
-                finalMessageWrapper = addMessageToChat(finalMessageObject, conversation.messages.length - 1);
-            }
-            fullResponseContent += chunkContent;
-            if (finalMessageWrapper) {
-                const contentElement = finalMessageWrapper.querySelector('.content-wrapper');
-                if (contentElement) {
-                    contentElement.innerHTML = marked.parse(fullResponseContent + '█');
+            
+            const responseStream = await puter.ai.chat(limitedHistory, {
+                model: state.currentModel,
+                signal: abortController.signal,
+                stream: true
+            });
+
+            let isFirstChunk = true;
+            for await (const chunk of responseStream) {
+                const chunkContent = chunk.message?.content || chunk || '';
+                if (!chunkContent) continue;
+
+                if (isFirstChunk) {
+                    isFirstChunk = false;
+                    thinkingMessageElement.remove();
+                    finalMessageObject = { role: 'assistant', content: '', modelUsed: state.currentModel, timestamp: new Date().toISOString() };
+                    conversation.messages.push(finalMessageObject);
+                    finalMessageWrapper = addMessageToChat({ ...finalMessageObject, content: '' }, conversation.messages.length - 1);
+                    responseContentElement = finalMessageWrapper.querySelector('.content-wrapper');
+                }
+
+                fullResponseContent += chunkContent;
+                if (responseContentElement) {
+                    let htmlContent = marked.parse(fullResponseContent + '█');
+                    responseContentElement.innerHTML = htmlContent;
                     dom.chatWindow.scrollTop = dom.chatWindow.scrollHeight;
                 }
             }
-        }
-    } catch (error) {
-        if (error.name === 'AbortError' || error.message === "User cancelled request") {
-            console.log("Stream aborted by user.");
-            wasAborted = true;
-        } else {
-            console.error('Puter.js Error:', error);
-            fullResponseContent = `**Error:** An unexpected error occurred. Please check the console for details. The selected model may not be available.`;
-        }
-    } finally {
-        thinkingMessageElement?.remove();
-        if (wasAborted) {
-            finalMessageWrapper?.remove();
-            if (finalMessageObject) conversation.messages.pop();
-        } else if (finalMessageObject && finalMessageWrapper) {
-            finalMessageObject.content = fullResponseContent;
-            finalMessageObject.thinkingTime = (performance.now() - startTime) / 1000;
-            const contentElement = finalMessageWrapper.querySelector('.content-wrapper');
-            if (contentElement) {
-                contentElement.innerHTML = marked.parse(fullResponseContent);
+        } catch (error) {
+            if (error.name === 'AbortError' || error.message === "User cancelled request") {
+                console.log("Stream aborted by user.");
+                wasAborted = true;
+            } else {
+                console.error('Puter.js Error:', error);
+                fullResponseContent = `**Error:** An unexpected error occurred. Please check the console for details. The selected model may not be available.`;
             }
-            const nameplateDiv = finalMessageWrapper.querySelector('.flex.items-center.space-x-2.text-xs');
-            if (nameplateDiv) {
-                const modelInfo = models.Flash.find(m => m.id === finalMessageObject.modelUsed) || models["Deep Think"].find(m => m.id === finalMessageObject.modelUsed);
-                const modelName = modelInfo ? modelInfo.name : 'Aetherion';
-                const displayTimestamp = formatTimestamp(finalMessageObject.timestamp);
-                nameplateDiv.innerHTML = `<svg viewBox="0 0 24 24" width="30px" height="30px" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M21.9953 13.5202L21.2481 13.5855L21.9953 13.5202ZM11.6958 9.11988L11.7644 8.37303L11.6958 9.11988ZM2.00472 11.684L2.75187 11.6187L2.00472 11.684ZM21.7428 14.381L21.1343 13.9426L21.7428 14.381ZM2.09486 12.0645L2.795 11.7956H2.795L2.09486 12.0645ZM2.52818 12.7426L3.0878 12.2432L2.52818 12.7426ZM4.07073 13.8946L3.70888 14.5515H3.70888L4.07073 13.8946ZM4.76127 10.2561C5.1599 10.1436 5.39184 9.72919 5.27932 9.33056C5.16679 8.93192 4.75242 8.69998 4.35378 8.81251L4.76127 10.2561ZM7.4702 15.9948C7.87022 16.1023 8.28165 15.8652 8.38917 15.4652C8.49669 15.0652 8.25957 14.6537 7.85955 14.5462L7.4702 15.9948ZM2.25716 10.8233L2.86569 11.2617L2.86569 11.2617L2.25716 10.8233ZM21.9051 13.1397L21.205 13.4086L21.9051 13.1397ZM21.4718 12.4617L20.9122 12.961L21.4718 12.4617ZM19.9293 11.3096L20.2911 10.6527V10.6527L19.9293 11.3096ZM16.5298 9.20941C16.1298 9.1019 15.7183 9.33902 15.6108 9.73903C15.5033 10.139 15.7404 10.5505 16.1404 10.658L16.5298 9.20941ZM8.33087 16.2098C8.73441 16.3032 9.13727 16.0518 9.23068 15.6483C9.32409 15.2447 9.07268 14.8419 8.66913 14.7484L8.33087 16.2098ZM18.396 15.1476C17.9896 15.2274 17.7248 15.6217 17.8047 16.0281C17.8846 16.4346 18.2788 16.6993 18.6853 16.6194L18.396 15.1476ZM7.96374 8.2781C7.55001 8.29813 7.23085 8.64976 7.25088 9.06349C7.27091 9.47722 7.62254 9.79638 8.03626 9.77635L7.96374 8.2781ZM22.7424 13.4549C22.6596 12.507 21.9299 11.7294 21.0716 11.1335L20.2162 12.3656C20.9828 12.8979 21.2259 13.3314 21.2481 13.5855L22.7424 13.4549ZM21.0716 11.1335C19.1329 9.78749 15.6203 8.7272 11.7644 8.37303L11.6272 9.86674C15.3616 10.2098 18.58 11.2297 20.2162 12.3656L21.0716 11.1335ZM19.6463 16.3917C20.7988 16.0664 21.8119 15.5682 22.3514 14.8194L21.1343 13.9426C20.9013 14.266 20.3052 14.6471 19.2388 14.9481L19.6463 16.3917ZM22.3514 14.8194C22.6343 14.4267 22.7868 13.9627 22.7424 13.4549L21.2481 13.5855C21.2576 13.6937 21.2327 13.806 21.1343 13.9426L22.3514 14.8194ZM1.25756 11.7493C1.27527 11.9519 1.32326 12.1473 1.39472 12.3334L2.795 11.7956C2.7691 11.7282 2.75632 11.6696 2.75187 11.6187L1.25756 11.7493ZM1.39472 12.3334C1.52223 12.6654 1.72455 12.9684 1.96856 13.2419L3.0878 12.2432C2.93276 12.0695 2.8423 11.9188 2.795 11.7956L1.39472 12.3334ZM1.96856 13.2419C2.40103 13.7266 3.00495 14.1638 3.70888 14.5515L4.43259 13.2377C3.81414 12.897 3.36749 12.5567 3.0878 12.2432L1.96856 13.2419ZM3.70888 14.5515C4.15237 14.7958 4.64619 15.0263 5.18026 15.2405L5.73861 13.8482C5.2518 13.653 4.81442 13.448 4.43259 13.2377L3.70888 14.5515ZM4.35378 8.81251C3.47512 9.06053 2.70631 9.4011 2.15313 9.85549C1.588 10.3197 1.18871 10.9611 1.25756 11.7493L2.75187 11.6187C2.73931 11.4749 2.78788 11.2753 3.10524 11.0146C3.43454 10.7441 3.98285 10.4758 4.76127 10.2561L4.35378 8.81251ZM21.0716 11.1335C20.4541 10.7047 19.6876 10.3118 18.8198 9.96378L18.2615 11.356C19.0574 11.6752 19.7165 12.0187 20.2162 12.3656L21.0716 11.1335ZM3.70887 14.5515C4.72605 15.1118 6.017 15.6042 7.4702 15.9948L7.85955 14.5462C6.48709 14.1773 5.31601 13.7243 4.43259 13.2377L3.70887 14.5515ZM1.25756 11.7493C1.34037 12.6972 2.07003 13.4748 2.92837 14.0708L3.78382 12.8386C3.01723 12.3064 2.77407 11.8728 2.75187 11.6187L1.25756 11.7493ZM4.35378 8.81251C3.20132 9.13781 2.18807 9.63607 1.64863 10.3849L2.86569 11.2617C3.0987 10.9382 3.69484 10.5571 4.76127 10.2561L4.35378 8.81251ZM1.64863 10.3849C1.36577 10.7775 1.2132 11.2414 1.25756 11.7492L2.75187 11.6187C2.74242 11.5105 2.76726 11.3983 2.86569 11.2617L1.64863 10.3849ZM22.7424 13.4549C22.7247 13.2522 22.6767 13.0569 22.6053 12.8708L21.205 13.4086C21.2309 13.4761 21.2437 13.5346 21.2481 13.5855L22.7424 13.4549ZM22.6053 12.8708C22.4778 12.5388 22.2754 12.2358 22.0314 11.9623L20.9122 12.961C21.0672 13.1348 21.1577 13.2855 21.205 13.4086L22.6053 12.8708ZM22.0314 11.9623C21.599 11.4777 20.995 11.0404 20.2911 10.6527L19.5674 11.9666C20.1859 12.3072 20.6325 12.6475 20.9122 12.961L22.0314 11.9623ZM20.2911 10.6527C19.8476 10.4084 19.3539 10.178 18.8198 9.96378L18.2615 11.356C18.7482 11.5512 19.1856 11.7562 19.5674 11.9666L20.2911 10.6527ZM19.6463 16.3917C20.525 16.1437 21.2937 15.8031 21.8469 15.3487C22.412 14.8845 22.8113 14.2431 22.7424 13.4549L21.2481 13.5855C21.2607 13.7293 21.2121 13.9289 20.8948 14.1896C20.5655 14.4601 20.0172 14.7284 19.2388 14.9481L19.6463 16.3917ZM2.92837 14.0708C3.54595 14.4995 4.3125 14.8924 5.18026 15.2405L5.73861 13.8482C4.94263 13.529 4.28349 13.1855 3.78381 12.8386L2.92837 14.0708ZM20.2911 10.6527C19.274 10.0924 17.983 9.6 16.5298 9.20941L16.1404 10.658C17.5129 11.0269 18.684 11.4799 19.5674 11.9666L20.2911 10.6527ZM2.92837 14.0708C4.19478 14.95 6.11586 15.6971 8.33087 16.2098L8.66913 14.7484C6.54758 14.2574 4.83166 13.5661 3.78382 12.8386L2.92837 14.0708ZM18.6853 16.6194C19.8304 16.3943 20.8262 16.0508 21.5432 15.573C22.2607 15.0948 22.8237 14.3848 22.7424 13.4549L21.2481 13.5855C21.2621 13.746 21.1959 14.0018 20.7114 14.3248C20.2263 14.6481 19.4472 14.941 18.396 15.1476L18.6853 16.6194ZM11.7644 8.37303C10.4184 8.24939 9.13637 8.22134 7.96374 8.2781L8.03626 9.77635C9.1339 9.72321 10.3456 9.74902 11.6272 9.86674L11.7644 8.37303Z" fill="#000000"></path> <path d="M15.2744 4.85061C15.5336 4.68703 15.7852 4.54535 16.0274 4.42706C16.9081 3.99692 17.6637 3.87605 18.2019 4.13627C18.4777 4.26963 18.6797 4.495 18.8114 4.79847C18.9345 5.08191 18.9963 5.43347 18.9998 5.84181M15.2744 4.85061C13.46 5.99564 11.2763 8.21359 9.38191 10.9923M15.2744 4.85061C14.8855 5.09602 14.4797 5.39073 14.0634 5.72967M6.78798 20.8588C6.79135 20.8604 6.79472 20.8621 6.79811 20.8637C6.91163 20.9186 7.03483 20.9566 7.16684 20.9782C7.40386 21.0171 7.66929 21.0035 7.95811 20.9412C8.47355 20.8302 9.06346 20.5644 9.69933 20.1659C9.84815 20.0727 9.9995 19.9721 10.153 19.8646C10.4088 19.6855 10.6706 19.4869 10.9367 19.2703L12.1115 18.3157M6.78798 20.8588C5.96226 20.4501 5.80688 19.2073 6.22201 17.5113M6.78798 20.8588C5.4601 20.2015 5.86563 17.3872 7.58996 14M18.7781 7.48866C18.9285 6.87418 19.004 6.31919 18.9998 5.84181M18.9998 5.84181C19.0073 6.69799 18.7585 7.80381 18.281 9.05476" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path> <path d="M11.7647 14.2813C11.7509 13.3709 11.7441 12.9157 12.0311 12.75C12.3181 12.5843 12.7089 12.8178 13.4905 13.2849L13.6927 13.4058C13.9148 13.5385 14.0258 13.6048 14.1481 13.6203C14.2705 13.6358 14.3902 13.5986 14.6298 13.5242L14.8479 13.4565C15.6908 13.1947 16.1123 13.0638 16.3656 13.2978C16.619 13.5318 16.5364 13.9757 16.3713 14.8635L16.3286 15.0932C16.2817 15.3455 16.2582 15.4716 16.286 15.5949C16.3139 15.7181 16.3898 15.8245 16.5418 16.0372L16.6801 16.2309C17.2148 16.9795 17.4821 17.3538 17.3517 17.6641C17.2213 17.9745 16.7794 18.0153 15.8958 18.0969L15.6672 18.118C15.4161 18.1412 15.2906 18.1528 15.1854 18.2135C15.0803 18.2742 15.0075 18.3771 14.8619 18.583L14.7293 18.7704C14.2168 19.4948 13.9605 19.8571 13.6266 19.8148C13.2926 19.7726 13.1021 19.354 12.7211 18.5166L12.6226 18.3C12.5143 18.062 12.4602 17.943 12.3674 17.8573C12.2745 17.7716 12.1536 17.7288 11.9116 17.6433L11.6914 17.5655C10.8399 17.2646 10.4142 17.1141 10.3383 16.7777C10.2623 16.4413 10.5864 16.1418 11.2345 15.5426L11.4022 15.3876C11.5864 15.2174 11.6785 15.1322 11.7263 15.0186C11.774 14.9049 11.7721 14.7755 11.7682 14.5168L11.7647 14.2813Z" stroke="#000000" stroke-width="1.5"></path> </g></svg><span>${modelName} (${finalMessageObject.thinkingTime.toFixed(2)}s)</span><span class="text-gray-700 font-normal">${displayTimestamp}</span>`;
+        } finally {
+            thinkingMessageElement?.remove();
+            if (wasAborted) {
+                finalMessageWrapper?.remove();
+                if(finalMessageObject) conversation.messages.pop();
+            } else if (finalMessageObject) {
+                finalMessageObject.content = fullResponseContent;
+                finalMessageObject.thinkingTime = (performance.now() - startTime) / 1000;
+                finalMessageWrapper?.remove();
+                addMessageToChat(finalMessageObject, conversation.messages.length - 1);
+            } else {
+                if (fullResponseContent) {
+                    const errorMsg = { role: 'assistant', content: fullResponseContent, modelUsed: 'system', timestamp: new Date().toISOString() };
+                    conversation.messages.push(errorMsg);
+                    addMessageToChat(errorMsg, conversation.messages.length - 1);
+                }
             }
-
-            addCopyButtons(finalMessageWrapper);
-            
-            // --- THIS IS THE KEY FIX ---
-            // Add a small delay to ensure the mhchem script is ready before rendering
-            setTimeout(() => {
-                if (window.renderMathInElement) {
-                    window.renderMathInElement(finalMessageWrapper, {
-                        delimiters: [
-                           {left: '$$', right: '$$', display: true},
-                           {left: '$', right: '$', display: false}
-                        ],
-                        throwOnError: false
-                    });
-                }
-                if (window.renderChemInElement) {
-                    window.renderChemInElement(finalMessageWrapper, {
-                        delimiters: [
-                           {left: '$$', right: '$$', display: true},
-                           {left: '$', right: '$', display: false}
-                        ],
-                        throwOnError: false
-                    });
-                }
-            }, 100); // 100ms delay
-
-        } else if (fullResponseContent) {
-            const errorMsg = { role: 'assistant', content: fullResponseContent, modelUsed: 'system', timestamp: new Date().toISOString() };
-            conversation.messages.push(errorMsg);
-            addMessageToChat(errorMsg, conversation.messages.length - 1);
+            setThinkingState(false);
+            saveStateToDB();
         }
-
-        setThinkingState(false);
-        saveStateToDB();
     }
-}
 
-        function showMemoriesModal() { dom.memoriesModal.classList.remove('hidden'); renderMemoriesList(); }
-        function renderMemoriesList() {
-            dom.memoriesList.innerHTML = '';
-            if (state.memories.length === 0) {
-                dom.memoriesList.innerHTML = `<div class="text-center text-gray-500 p-8">No memories saved yet. Add one to get started!</div>`;
-                return;
-            }
-            state.memories.forEach(memory => {
-                const card = document.createElement('div');
-                card.className = "memory-card group";
-                card.dataset.id = memory.id;
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                        <h3 class="font-bold text-lg truncate">${memory.title}</h3>
-                        <div class="relative z-10">
-                            <button class="p-1 rounded-full hover:bg-black/20 memory-menu-btn">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                            </button>
-                            <div class="absolute right-0 mt-2 w-32 bg-[var(--surface-dark)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-20 memory-menu">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)] edit-btn">Edit</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-red-400 hover:bg-[var(--hover-dark)] delete-btn">Delete</a>
-                            </div>
+    function showMemoriesModal() { dom.memoriesModal.classList.remove('hidden'); renderMemoriesList(); }
+    function renderMemoriesList() {
+        dom.memoriesList.innerHTML = '';
+        if (state.memories.length === 0) {
+            dom.memoriesList.innerHTML = `<div class="text-center text-gray-500 p-8">No memories saved yet. Add one to get started!</div>`;
+            return;
+        }
+        state.memories.forEach(memory => {
+            const card = document.createElement('div');
+            card.className = "memory-card group";
+            card.dataset.id = memory.id;
+            card.innerHTML = `
+                <div class="flex justify-between items-center mb-2 flex-shrink-0">
+                    <h3 class="font-bold text-lg truncate">${memory.title}</h3>
+                    <div class="relative z-10">
+                        <button class="p-1 rounded-full hover:bg-black/20 memory-menu-btn">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-32 bg-[var(--surface-dark)] border border-[var(--hover-dark)] rounded-md shadow-lg hidden z-20 memory-menu">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-[var(--hover-dark)] edit-btn">Edit</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-red-400 hover:bg-[var(--hover-dark)] delete-btn">Delete</a>
                         </div>
                     </div>
-                    <p class="text-gray-400 text-sm memory-card-content">${memory.content}</p>
-                `;
-                card.querySelector('.memory-menu-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const dropdown = card.querySelector('.memory-menu');
-                    document.querySelectorAll('.memory-menu').forEach(m => { if (m !== dropdown) m.classList.add('hidden'); });
-                    dropdown.classList.toggle('hidden');
-                });
-                card.querySelector('.edit-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); editMemory(memory.id); });
-                card.querySelector('.delete-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); deleteMemory(memory.id); });
-                dom.memoriesList.appendChild(card);
-            });
-        }
-
-        function editMemory(id) {
-            const isNew = id === null;
-            const memory = isNew ? { title: '', content: '' } : state.memories.find(m => m.id === id);
-            if (!memory) return;
-
-            const modalTitle = isNew ? 'Add New Memory' : 'Edit Memory';
-
-            dom.modalTitle.textContent = modalTitle;
-            dom.modalContent.innerHTML = `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-1">Title</label>
-                        <input id="modal-mem-title" type="text" value="${memory.title}" class="w-full bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-1">Content</label>
-                        <textarea id="modal-mem-content" class="w-full h-40 bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none resize-none">${memory.content}</textarea>
-                    </div>
                 </div>
+                <p class="text-gray-400 text-sm memory-card-content">${memory.content}</p>
             `;
-            dom.modalActions.innerHTML = `<button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button><button id="modal-confirm" class="modern-btn font-bold py-2 px-4 rounded-md">Save</button>`;
-            dom.genericModal.classList.remove('hidden');
-
-            const titleInput = document.getElementById('modal-mem-title');
-            const contentInput = document.getElementById('modal-mem-content');
-            titleInput.focus();
-
-            const confirmBtn = document.getElementById('modal-confirm');
-            const cancelBtn = document.getElementById('modal-cancel');
-
-            const cleanup = () => { dom.genericModal.classList.add('hidden'); };
-
-            const submit = () => {
-                const title = titleInput.value.trim();
-                const content = contentInput.value.trim();
-                if (!title || !content) return;
-
-                if (isNew) {
-                    state.memories.push({ id: `mem-${Date.now()}`, title, content });
-                } else {
-                    memory.title = title;
-                    memory.content = content;
-                }
-                saveStateToDB();
-                renderMemoriesList();
-                cleanup();
-            };
-
-            confirmBtn.onclick = submit;
-            cancelBtn.onclick = cleanup;
-        }
-
-        function deleteMemory(id) {
-            showConfirmModal("Delete Memory?", "Are you sure you want to delete this memory?", (confirmed) => {
-                if (confirmed) {
-                    state.memories = state.memories.filter(m => m.id !== id);
-                    saveStateToDB();
-                    renderMemoriesList();
-                }
+            card.querySelector('.memory-menu-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dropdown = card.querySelector('.memory-menu');
+                document.querySelectorAll('.memory-menu').forEach(m => { if (m !== dropdown) m.classList.add('hidden'); });
+                dropdown.classList.toggle('hidden');
             });
-        }
+            card.querySelector('.edit-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); editMemory(memory.id); });
+            card.querySelector('.delete-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); deleteMemory(memory.id); });
+            dom.memoriesList.appendChild(card);
+        });
+    }
 
-        function togglePinConversation(convoId) {
-            const index = state.pinnedConversations.indexOf(convoId);
-            if (index > -1) {
-                state.pinnedConversations.splice(index, 1);
+    function editMemory(id) {
+        const isNew = id === null;
+        const memory = isNew ? { title: '', content: '' } : state.memories.find(m => m.id === id);
+        if (!memory) return;
+
+        const modalTitle = isNew ? 'Add New Memory' : 'Edit Memory';
+
+        dom.modalTitle.textContent = modalTitle;
+        dom.modalContent.innerHTML = `
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Title</label>
+                    <input id="modal-mem-title" type="text" value="${memory.title}" class="w-full bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Content</label>
+                    <textarea id="modal-mem-content" class="w-full h-40 bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none resize-none">${memory.content}</textarea>
+                </div>
+            </div>
+        `;
+        dom.modalActions.innerHTML = `<button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button><button id="modal-confirm" class="modern-btn font-bold py-2 px-4 rounded-md">Save</button>`;
+        dom.genericModal.classList.remove('hidden');
+
+        const titleInput = document.getElementById('modal-mem-title');
+        const contentInput = document.getElementById('modal-mem-content');
+        titleInput.focus();
+
+        const confirmBtn = document.getElementById('modal-confirm');
+        const cancelBtn = document.getElementById('modal-cancel');
+
+        const cleanup = () => { dom.genericModal.classList.add('hidden'); };
+
+        const submit = () => {
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            if (!title || !content) return;
+
+            if (isNew) {
+                state.memories.push({ id: `mem-${Date.now()}`, title, content });
             } else {
-                state.pinnedConversations.push(convoId);
+                memory.title = title;
+                memory.content = content;
             }
             saveStateToDB();
-            renderConversationList();
-        }
+            renderMemoriesList();
+            cleanup();
+        };
 
-        function showCharacterModal() {
-            dom.characterModal.classList.remove('hidden');
-            renderCharacterListInModal();
-        }
+        confirmBtn.onclick = submit;
+        cancelBtn.onclick = cleanup;
+    }
 
-        function renderCharacterListInModal() {
-            dom.characterList.innerHTML = '';
-            if (state.characters.length === 0) {
-                dom.characterList.innerHTML = `<div class="text-center text-gray-500 p-8">No characters created yet.</div>`;
-                return;
+    function deleteMemory(id) {
+        showConfirmModal("Delete Memory?", "Are you sure you want to delete this memory?", (confirmed) => {
+            if (confirmed) {
+                state.memories = state.memories.filter(m => m.id !== id);
+                saveStateToDB();
+                renderMemoriesList();
             }
-            state.characters.forEach(char => {
-                const card = document.createElement('div');
-                card.className = `character-card`;
-                card.dataset.id = char.id;
-                card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-lg">${char.name}</h3>
-                        <div class="flex items-center space-x-2 flex-shrink-0 ml-4">
-                            <label class="flex items-center cursor-pointer">
-                                <span class="mr-2 text-sm text-gray-400">Show</span>
-                                <div class="relative">
-                                    <input type="checkbox" class="sr-only visibility-toggle" ${char.isVisible ? 'checked' : ''}>
-                                    <div class="block bg-gray-600 w-10 h-6 rounded-full"></div>
-                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
-                                </div>
-                            </label>
-                            <button title="Edit" class="p-2 rounded-full hover:bg-[var(--hover-dark)] edit-char-btn">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
-                            </button>
-                            <button title="Delete" class="p-2 rounded-full hover:bg-[var(--hover-dark)] text-red-400 delete-char-btn">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                card.querySelector('.visibility-toggle').addEventListener('change', (e) => toggleCharacterVisibility(char.id, e.target.checked));
-                card.querySelector('.edit-char-btn').addEventListener('click', () => editCharacter(char.id));
-                card.querySelector('.delete-char-btn').addEventListener('click', () => deleteCharacter(char.id));
-                dom.characterList.appendChild(card);
-            });
-            const style = document.createElement('style');
-            style.innerHTML = `
-                .visibility-toggle:checked ~ .dot { transform: translateX(100%); background-color: var(--primary-accent); }
-                .visibility-toggle:checked ~ .block { background-color: var(--primary-accent-darker); }
-            `;
-            dom.characterList.appendChild(style);
+        });
+    }
+
+    function togglePinConversation(convoId) {
+        const index = state.pinnedConversations.indexOf(convoId);
+        if (index > -1) {
+            state.pinnedConversations.splice(index, 1);
+        } else {
+            state.pinnedConversations.push(convoId);
         }
+        saveStateToDB();
+        renderConversationList();
+    }
 
-        function editCharacter(id) {
-            const isNew = id === null;
-            const character = isNew ? { name: '', description: '', tags: '' } : state.characters.find(c => c.id === id);
-            if (!character) return;
+    function showCharacterModal() {
+        dom.characterModal.classList.remove('hidden');
+        renderCharacterListInModal();
+    }
 
-            const modalTitle = isNew ? 'Add New Character' : 'Edit Character';
-
-            dom.modalTitle.textContent = modalTitle;
-            dom.modalContent.innerHTML = `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-1">Name</label>
-                        <input id="modal-char-name" type="text" value="${character.name}" class="w-full bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-1">Description (Persona)</label>
-                        <textarea id="modal-char-desc" class="w-full h-40 bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none resize-none">${character.description}</textarea>
-                    </div>
-                     <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-1">Tags (comma-separated)</label>
-                        <input id="modal-char-tags" type="text" value="${character.tags || ''}" placeholder="e.g. ruthless, concise, witty" class="w-full bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">
+    function renderCharacterListInModal() {
+        dom.characterList.innerHTML = '';
+        if (state.characters.length === 0) {
+            dom.characterList.innerHTML = `<div class="text-center text-gray-500 p-8">No characters created yet.</div>`;
+            return;
+        }
+        state.characters.forEach(char => {
+            const card = document.createElement('div');
+            card.className = `character-card`;
+            card.dataset.id = char.id;
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-lg">${char.name}</h3>
+                    <div class="flex items-center space-x-2 flex-shrink-0 ml-4">
+                        <label class="flex items-center cursor-pointer">
+                            <span class="mr-2 text-sm text-gray-400">Show</span>
+                            <div class="relative">
+                                <input type="checkbox" class="sr-only visibility-toggle" ${char.isVisible ? 'checked' : ''}>
+                                <div class="block bg-gray-600 w-10 h-6 rounded-full"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                            </div>
+                        </label>
+                        <button title="Edit" class="p-2 rounded-full hover:bg-[var(--hover-dark)] edit-char-btn">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
+                        </button>
+                        <button title="Delete" class="p-2 rounded-full hover:bg-[var(--hover-dark)] text-red-400 delete-char-btn">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
                     </div>
                 </div>
             `;
-            dom.modalActions.innerHTML = `<button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button><button id="modal-confirm" class="modern-btn font-bold py-2 px-4 rounded-md">Save</button>`;
-            dom.genericModal.classList.remove('hidden');
+            card.querySelector('.visibility-toggle').addEventListener('change', (e) => toggleCharacterVisibility(char.id, e.target.checked));
+            card.querySelector('.edit-char-btn').addEventListener('click', () => editCharacter(char.id));
+            card.querySelector('.delete-char-btn').addEventListener('click', () => deleteCharacter(char.id));
+            dom.characterList.appendChild(card);
+        });
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .visibility-toggle:checked ~ .dot { transform: translateX(100%); background-color: var(--primary-accent); }
+            .visibility-toggle:checked ~ .block { background-color: var(--primary-accent-darker); }
+        `;
+        dom.characterList.appendChild(style);
+    }
 
-            const nameInput = document.getElementById('modal-char-name');
-            const descInput = document.getElementById('modal-char-desc');
-            const tagsInput = document.getElementById('modal-char-tags');
-            nameInput.focus();
+    function editCharacter(id) {
+        const isNew = id === null;
+        const character = isNew ? { name: '', description: '', tags: '' } : state.characters.find(c => c.id === id);
+        if (!character) return;
 
-            const confirmBtn = document.getElementById('modal-confirm');
-            const cancelBtn = document.getElementById('modal-cancel');
+        const modalTitle = isNew ? 'Add New Character' : 'Edit Character';
 
-            const cleanup = () => { dom.genericModal.classList.add('hidden'); };
+        dom.modalTitle.textContent = modalTitle;
+        dom.modalContent.innerHTML = `
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Name</label>
+                    <input id="modal-char-name" type="text" value="${character.name}" class="w-full bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Description (Persona)</label>
+                    <textarea id="modal-char-desc" class="w-full h-40 bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none resize-none">${character.description}</textarea>
+                </div>
+                 <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Tags (comma-separated)</label>
+                    <input id="modal-char-tags" type="text" value="${character.tags || ''}" placeholder="e.g. ruthless, concise, witty" class="w-full bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">
+                </div>
+            </div>
+        `;
+        dom.modalActions.innerHTML = `<button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button><button id="modal-confirm" class="modern-btn font-bold py-2 px-4 rounded-md">Save</button>`;
+        dom.genericModal.classList.remove('hidden');
 
-            const submit = () => {
-                const name = nameInput.value.trim();
-                const description = descInput.value.trim();
-                const tags = tagsInput.value.trim();
-                if (!name || !description) return;
+        const nameInput = document.getElementById('modal-char-name');
+        const descInput = document.getElementById('modal-char-desc');
+        const tagsInput = document.getElementById('modal-char-tags');
+        nameInput.focus();
 
-                if (isNew) {
-                    state.characters.push({ id: `char-${Date.now()}`, name, description, tags, isVisible: true });
-                } else {
-                    character.name = name;
-                    character.description = description;
-                    character.tags = tags;
+        const confirmBtn = document.getElementById('modal-confirm');
+        const cancelBtn = document.getElementById('modal-cancel');
+
+        const cleanup = () => { dom.genericModal.classList.add('hidden'); };
+
+        const submit = () => {
+            const name = nameInput.value.trim();
+            const description = descInput.value.trim();
+            const tags = tagsInput.value.trim();
+            if (!name || !description) return;
+
+            if (isNew) {
+                state.characters.push({ id: `char-${Date.now()}`, name, description, tags, isVisible: true });
+            } else {
+                character.name = name;
+                character.description = description;
+                character.tags = tags;
+            }
+            saveStateToDB();
+            renderCharacterListInModal();
+            renderCharacterSwitcher();
+            cleanup();
+        };
+
+        confirmBtn.onclick = submit;
+        cancelBtn.onclick = cleanup;
+    }
+
+    function deleteCharacter(id) {
+        showConfirmModal("Delete Character?", "Are you sure? This cannot be undone.", (confirmed) => {
+            if (confirmed) {
+                state.characters = state.characters.filter(c => c.id !== id);
+                if (state.activeCharacterId === id) {
+                    state.activeCharacterId = null;
                 }
                 saveStateToDB();
                 renderCharacterListInModal();
                 renderCharacterSwitcher();
-                cleanup();
-            };
-
-            confirmBtn.onclick = submit;
-            cancelBtn.onclick = cleanup;
-        }
-
-        function deleteCharacter(id) {
-            showConfirmModal("Delete Character?", "Are you sure? This cannot be undone.", (confirmed) => {
-                if (confirmed) {
-                    state.characters = state.characters.filter(c => c.id !== id);
-                    if (state.activeCharacterId === id) {
-                        state.activeCharacterId = null;
-                    }
-                    saveStateToDB();
-                    renderCharacterListInModal();
-                    renderCharacterSwitcher();
-                }
-            });
-        }
-
-        function toggleCharacterVisibility(id, isVisible) {
-            const character = state.characters.find(c => c.id === id);
-            if (character) {
-                character.isVisible = isVisible;
-                saveStateToDB();
-                renderCharacterSwitcher();
             }
+        });
+    }
+
+    function toggleCharacterVisibility(id, isVisible) {
+        const character = state.characters.find(c => c.id === id);
+        if (character) {
+            character.isVisible = isVisible;
+            saveStateToDB();
+            renderCharacterSwitcher();
+        }
+    }
+
+    function renderCharacterSwitcher() {
+        const activeCharacter = state.characters.find(c => c.id === state.activeCharacterId);
+        const svgIcon = `<span class="mr-2"></span>`;
+
+        dom.characterSwitcherBtn.innerHTML = `
+            ${svgIcon}
+            <span class="text-gray-400 mr-2 text-sm">Persona:</span>
+            <span class="font-bold truncate">${activeCharacter ? activeCharacter.name : 'Default'}</span>
+            <svg class="w-4 h-4 ml-auto flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path></svg>
+        `;
+
+        const dropdown = dom.characterSwitcherDropdown;
+        dropdown.innerHTML = '';
+
+        const defaultItem = document.createElement('a');
+        defaultItem.href = '#';
+        defaultItem.className = 'model-selector-item flex items-center px-4 py-2 text-sm text-gray-300';
+        defaultItem.dataset.charId = 'null';
+        defaultItem.innerHTML = '<span>Default (No Persona)</span>';
+        if (!state.activeCharacterId) {
+            defaultItem.classList.add('selected');
+        }
+        dropdown.appendChild(defaultItem);
+
+        const visibleChars = state.characters.filter(c => c.isVisible);
+        if (visibleChars.length > 0) {
+            const separator = document.createElement('hr');
+            separator.className = 'border-t border-[var(--hover-dark)] my-1 mx-2';
+            dropdown.appendChild(separator);
         }
 
-        function renderCharacterSwitcher() {
-            const activeCharacter = state.characters.find(c => c.id === state.activeCharacterId);
-            const svgIcon = `<span class="mr-2"><svg width="25px" height="25px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>profile_round [#1342]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke-width="0.0002" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-140.000000, -2159.000000)" fill="#C8A2C8"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M100.562548,2016.99998 L87.4381713,2016.99998 C86.7317804,2016.99998 86.2101535,2016.30298 86.4765813,2015.66198 C87.7127655,2012.69798 90.6169306,2010.99998 93.9998492,2010.99998 C97.3837885,2010.99998 100.287954,2012.69798 101.524138,2015.66198 C101.790566,2016.30298 101.268939,2016.99998 100.562548,2016.99998 M89.9166645,2004.99998 C89.9166645,2002.79398 91.7489936,2000.99998 93.9998492,2000.99998 C96.2517256,2000.99998 98.0830339,2002.79398 98.0830339,2004.99998 C98.0830339,2007.20598 96.2517256,2008.99998 93.9998492,2008.99998 C91.7489936,2008.99998 89.9166645,2007.20598 89.9166645,2004.99998 M103.955674,2016.63598 C103.213556,2013.27698 100.892265,2010.79798 97.837022,2009.67298 C99.4560048,2008.39598 100.400241,2006.33098 100.053171,2004.06998 C99.6509769,2001.44698 97.4235996,1999.34798 94.7348224,1999.04198 C91.0232075,1998.61898 87.8750721,2001.44898 87.8750721,2004.99998 C87.8750721,2006.88998 88.7692896,2008.57398 90.1636971,2009.67298 C87.1074334,2010.79798 84.7871636,2013.27698 84.044024,2016.63598 C83.7745338,2017.85698 84.7789973,2018.99998 86.0539717,2018.99998 L101.945727,2018.99998 C103.221722,2018.99998 104.226185,2017.85698 103.955674,2016.63598" id="profile_round-[#1342]"> </path> </g> </g> </g> </g></svg></span>`;
+        visibleChars.forEach(char => {
+            const item = document.createElement('a');
+            item.href = '#';
+            item.className = 'model-selector-item flex items-center px-4 py-2 text-sm text-gray-300';
+            item.dataset.charId = char.id;
+            item.innerHTML = `<span>${char.name}</span>`;
+            if (state.activeCharacterId === char.id) {
+                item.classList.add('selected');
+            }
+            dropdown.appendChild(item);
+        });
+    }
 
-            dom.characterSwitcherBtn.innerHTML = `
-                ${svgIcon}
-                <span class="text-gray-400 mr-2 text-sm">Persona:</span>
-                <span class="font-bold truncate">${activeCharacter ? activeCharacter.name : 'Default'}</span>
-                <svg class="w-4 h-4 ml-auto flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path></svg>
-            `;
 
-            const dropdown = dom.characterSwitcherDropdown;
+    function showLinkModal(url) {
+        dom.modalTitle.textContent = "Link Action";
+        dom.modalContent.innerHTML = `<p class="text-gray-400 break-all">URL: ${url}</p>`;
+        dom.modalActions.innerHTML = `
+            <button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button>
+            <button id="modal-copy" class="modern-btn font-bold py-2 px-4 rounded-md">Copy Link</button>
+            <button id="modal-open" class="modern-btn font-bold py-2 px-4 rounded-md">Open Link</button>
+        `;
+        dom.genericModal.classList.remove('hidden');
+
+        const openBtn = document.getElementById('modal-open');
+        const copyBtn = document.getElementById('modal-copy');
+        const cancelBtn = document.getElementById('modal-cancel');
+
+        const cleanup = () => {
+            openBtn.replaceWith(openBtn.cloneNode(true));
+            copyBtn.replaceWith(copyBtn.cloneNode(true));
+            cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            dom.genericModal.classList.add('hidden');
+        };
+
+        openBtn.onclick = () => {
+            window.open(url, '_blank', 'noopener,noreferrer');
+            cleanup();
+        };
+
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(url).then(() => {
+                copyBtn.textContent = "Copied!";
+                setTimeout(() => { cleanup(); }, 1000);
+            });
+        };
+
+        cancelBtn.onclick = cleanup;
+    }
+
+    function showConfirmModal(title, content, callback, isAlert = false) {
+        dom.modalTitle.textContent = title;
+        dom.modalContent.innerHTML = `<p class="text-gray-400">${content}</p>`;
+        if (isAlert) {
+            dom.modalActions.innerHTML = `<button id="modal-confirm" class="modern-btn font-bold py-2 px-4 rounded-md">OK</button>`;
+        } else {
+            dom.modalActions.innerHTML = `<button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button><button id="modal-confirm" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md">Confirm</button>`;
+        }
+        dom.genericModal.classList.remove('hidden');
+        const confirmBtn = document.getElementById('modal-confirm');
+        const cancelBtn = document.getElementById('modal-cancel');
+        const cleanup = () => {
+            confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+            if (cancelBtn) cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            dom.genericModal.classList.add('hidden');
+        };
+        confirmBtn.onclick = () => { cleanup(); callback(true); };
+        if (cancelBtn) {
+            cancelBtn.onclick = () => { cleanup(); callback(false); };
+        }
+    }
+    function showPromptModal(title, defaultValue, callback) {
+        dom.modalTitle.textContent = title;
+        dom.modalContent.innerHTML = `<input id="modal-input" type="text" class="w-full bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">`;
+        const input = document.getElementById('modal-input');
+        input.value = defaultValue;
+        dom.modalActions.innerHTML = `<button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button><button id="modal-confirm" class="modern-btn font-bold py-2 px-4 rounded-md">Save</button>`;
+        dom.genericModal.classList.remove('hidden');
+        input.focus(); input.select();
+        const confirmBtn = document.getElementById('modal-confirm'), cancelBtn = document.getElementById('modal-cancel');
+        const cleanup = () => { confirmBtn.replaceWith(confirmBtn.cloneNode(true)); cancelBtn.replaceWith(cancelBtn.cloneNode(true)); dom.genericModal.classList.add('hidden'); };
+        const submit = () => { const value = input.value.trim(); if (value) { cleanup(); callback(value); } };
+        confirmBtn.onclick = submit;
+        input.onkeydown = (e) => { if (e.key === 'Enter') submit(); };
+        cancelBtn.onclick = () => { cleanup(); callback(null); };
+    }
+
+    function populateModelSelector() {
+        const dropdowns = [dom.modelSelectorDropdownDesktop, dom.modelSelectorDropdownMobile];
+        dropdowns.forEach(dropdown => {
             dropdown.innerHTML = '';
+            for (const category in models) {
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'px-4 py-2 text-xs font-bold text-gray-400 uppercase';
+                categoryHeader.textContent = category;
+                dropdown.appendChild(categoryHeader);
 
-            const defaultItem = document.createElement('a');
-            defaultItem.href = '#';
-            defaultItem.className = 'model-selector-item flex items-center px-4 py-2 text-sm text-gray-300';
-            defaultItem.dataset.charId = 'null';
-            defaultItem.innerHTML = '<span>Default (No Persona)</span>';
-            if (!state.activeCharacterId) {
-                defaultItem.classList.add('selected');
-            }
-            dropdown.appendChild(defaultItem);
+                models[category].forEach(model => {
+                    const item = document.createElement('a');
+                    item.href = '#';
+                    item.className = 'model-selector-item flex items-center px-4 py-2 text-sm text-gray-300';
+                    if (model.id === state.currentModel) {
+                        item.classList.add('selected');
+                    }
+                    item.dataset.modelId = model.id;
+                    item.innerHTML = `<img src="${model.logo}" alt="${model.name} logo" class="w-5 h-5 mr-3 rounded-full object-cover"><span>${model.name}</span>`;
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        state.currentModel = model.id;
 
-            const visibleChars = state.characters.filter(c => c.isVisible);
-            if (visibleChars.length > 0) {
-                const separator = document.createElement('hr');
-                separator.className = 'border-t border-[var(--hover-dark)] my-1 mx-2';
-                dropdown.appendChild(separator);
-            }
+                        if(state.activeConversationId) {
+                            state.conversations[state.activeConversationId].model = model.id;
+                        }
 
-            visibleChars.forEach(char => {
-                const item = document.createElement('a');
-                item.href = '#';
-                item.className = 'model-selector-item flex items-center px-4 py-2 text-sm text-gray-300';
-                item.dataset.charId = char.id;
-                item.innerHTML = `<span>${char.name}</span>`;
-                if (state.activeCharacterId === char.id) {
-                    item.classList.add('selected');
-                }
-                dropdown.appendChild(item);
-            });
-        }
-
-
-        function showLinkModal(url) {
-            dom.modalTitle.textContent = "Link Action";
-            dom.modalContent.innerHTML = `<p class="text-gray-400 break-all">URL: ${url}</p>`;
-            dom.modalActions.innerHTML = `
-                <button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button>
-                <button id="modal-copy" class="modern-btn font-bold py-2 px-4 rounded-md">Copy Link</button>
-                <button id="modal-open" class="modern-btn font-bold py-2 px-4 rounded-md">Open Link</button>
-            `;
-            dom.genericModal.classList.remove('hidden');
-
-            const openBtn = document.getElementById('modal-open');
-            const copyBtn = document.getElementById('modal-copy');
-            const cancelBtn = document.getElementById('modal-cancel');
-
-            const cleanup = () => {
-                openBtn.replaceWith(openBtn.cloneNode(true));
-                copyBtn.replaceWith(copyBtn.cloneNode(true));
-                cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-                dom.genericModal.classList.add('hidden');
-            };
-
-            openBtn.onclick = () => {
-                window.open(url, '_blank', 'noopener,noreferrer');
-                cleanup();
-            };
-
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(url).then(() => {
-                    copyBtn.textContent = "Copied!";
-                    setTimeout(() => { cleanup(); }, 1000);
+                        updateUI();
+                        saveStateToDB();
+                        dropdowns.forEach(d => d.classList.add('hidden'));
+                    });
+                    dropdown.appendChild(item);
                 });
-            };
-
-            cancelBtn.onclick = cleanup;
-        }
-
-        function showConfirmModal(title, content, callback, isAlert = false) {
-            dom.modalTitle.textContent = title;
-            dom.modalContent.innerHTML = `<p class="text-gray-400">${content}</p>`;
-            if (isAlert) {
-                dom.modalActions.innerHTML = `<button id="modal-confirm" class="modern-btn font-bold py-2 px-4 rounded-md">OK</button>`;
-            } else {
-                dom.modalActions.innerHTML = `<button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button><button id="modal-confirm" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md">Confirm</button>`;
             }
-            dom.genericModal.classList.remove('hidden');
-            const confirmBtn = document.getElementById('modal-confirm');
-            const cancelBtn = document.getElementById('modal-cancel');
-            const cleanup = () => {
-                confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-                if (cancelBtn) cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-                dom.genericModal.classList.add('hidden');
-            };
-            confirmBtn.onclick = () => { cleanup(); callback(true); };
-            if (cancelBtn) {
-                cancelBtn.onclick = () => { cleanup(); callback(false); };
-            }
-        }
-        function showPromptModal(title, defaultValue, callback) {
-            dom.modalTitle.textContent = title;
-            dom.modalContent.innerHTML = `<input id="modal-input" type="text" class="w-full bg-[var(--surface-light)] rounded-md py-2 px-3 focus:ring-1 focus:ring-[var(--primary-accent)] focus:outline-none">`;
-            const input = document.getElementById('modal-input');
-            input.value = defaultValue;
-            dom.modalActions.innerHTML = `<button id="modal-cancel" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Cancel</button><button id="modal-confirm" class="modern-btn font-bold py-2 px-4 rounded-md">Save</button>`;
-            dom.genericModal.classList.remove('hidden');
-            input.focus(); input.select();
-            const confirmBtn = document.getElementById('modal-confirm'), cancelBtn = document.getElementById('modal-cancel');
-            const cleanup = () => { confirmBtn.replaceWith(confirmBtn.cloneNode(true)); cancelBtn.replaceWith(cancelBtn.cloneNode(true)); dom.genericModal.classList.add('hidden'); };
-            const submit = () => { const value = input.value.trim(); if (value) { cleanup(); callback(value); } };
-            confirmBtn.onclick = submit;
-            input.onkeydown = (e) => { if (e.key === 'Enter') submit(); };
-            cancelBtn.onclick = () => { cleanup(); callback(null); };
+        });
+    }
+
+    function showExportModal() {
+        dom.exportList.innerHTML = '';
+        const sortedConversations = Object.values(state.conversations).sort((a,b) => b.timestamp - a.timestamp);
+
+        sortedConversations.forEach(convo => {
+            const label = document.createElement('label');
+            label.className = 'flex items-center space-x-3 p-2 rounded-md hover:bg-[var(--hover-dark)] cursor-pointer';
+            label.innerHTML = `
+                <input type="checkbox" data-convo-id="${convo.id}" class="h-4 w-4 rounded bg-[var(--surface-dark)] border-[var(--hover-dark)] text-[var(--primary-accent)] focus:ring-[var(--primary-accent)]">
+                <span class="truncate">${convo.title}</span>
+            `;
+            dom.exportList.appendChild(label);
+        });
+        dom.exportModal.classList.remove('hidden');
+    }
+
+    function exportSelectedConversations() {
+        const selectedIds = Array.from(dom.exportList.querySelectorAll('input:checked')).map(input => input.dataset.convoId);
+        if (selectedIds.length === 0) {
+            showConfirmModal("Export Error", "Please select at least one conversation to export.", () => {}, true);
+            return;
         }
 
-        function populateModelSelector() {
-            const dropdowns = [dom.modelSelectorDropdownDesktop, dom.modelSelectorDropdownMobile];
-            dropdowns.forEach(dropdown => {
-                dropdown.innerHTML = '';
-                for (const category in models) {
-                    const categoryHeader = document.createElement('div');
-                    categoryHeader.className = 'px-4 py-2 text-xs font-bold text-gray-400 uppercase';
-                    categoryHeader.textContent = category;
-                    dropdown.appendChild(categoryHeader);
+        const conversationsToExport = selectedIds.map(id => state.conversations[id]).filter(Boolean);
 
-                    models[category].forEach(model => {
-                        const item = document.createElement('a');
-                        item.href = '#';
-                        item.className = 'model-selector-item flex items-center px-4 py-2 text-sm text-gray-300';
-                        if (model.id === state.currentModel) {
-                            item.classList.add('selected');
-                        }
-                        item.dataset.modelId = model.id;
-                        item.innerHTML = `<img src="${model.logo}" alt="${model.name} logo" class="w-5 h-5 mr-3 rounded-full object-cover"><span>${model.name}</span>`;
-                        item.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            state.currentModel = model.id;
+        const exportData = {
+            type: "AetherionChatExport",
+            version: 1,
+            timestamp: new Date().toISOString(),
+            data: conversationsToExport
+        };
 
-                            if(state.activeConversationId) {
-                                state.conversations[state.activeConversationId].model = model.id;
-                            }
+        const jsonString = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `aetherion_export_${Date.now()}.aether`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        dom.exportModal.classList.add('hidden');
+    }
 
-                            updateUI();
-                            saveStateToDB();
-                            dropdowns.forEach(d => d.classList.add('hidden'));
-                        });
-                        dropdown.appendChild(item);
-                    });
+    function importConversation(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+
+                if (data.type !== "AetherionChatExport" || !Array.isArray(data.data)) {
+                    throw new Error("Invalid or corrupted Aetherion export file.");
                 }
-            });
-        }
 
-        function showExportModal() {
-            dom.exportList.innerHTML = '';
-            const sortedConversations = Object.values(state.conversations).sort((a,b) => b.timestamp - a.timestamp);
+                let importedCount = 0;
+                let lastImportedId = null;
 
-            sortedConversations.forEach(convo => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center space-x-3 p-2 rounded-md hover:bg-[var(--hover-dark)] cursor-pointer';
-                label.innerHTML = `
-                    <input type="checkbox" data-convo-id="${convo.id}" class="h-4 w-4 rounded bg-[var(--surface-dark)] border-[var(--hover-dark)] text-[var(--primary-accent)] focus:ring-[var(--primary-accent)]">
-                    <span class="truncate">${convo.title}</span>
-                `;
-                dom.exportList.appendChild(label);
-            });
-            dom.exportModal.classList.remove('hidden');
-        }
-
-        function exportSelectedConversations() {
-            const selectedIds = Array.from(dom.exportList.querySelectorAll('input:checked')).map(input => input.dataset.convoId);
-            if (selectedIds.length === 0) {
-                showConfirmModal("Export Error", "Please select at least one conversation to export.", () => {}, true);
-                return;
-            }
-
-            const conversationsToExport = selectedIds.map(id => state.conversations[id]).filter(Boolean);
-
-            const exportData = {
-                type: "AetherionChatExport",
-                version: 1,
-                timestamp: new Date().toISOString(),
-                data: conversationsToExport
-            };
-
-            const jsonString = JSON.stringify(exportData, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `aetherion_export_${Date.now()}.aether`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            dom.exportModal.classList.add('hidden');
-        }
-
-        function importConversation(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-
-                    if (data.type !== "AetherionChatExport" || !Array.isArray(data.data)) {
-                        throw new Error("Invalid or corrupted Aetherion export file.");
+                data.data.forEach((convo, index) => {
+                    if (convo.id && convo.title && Array.isArray(convo.messages)) {
+                        const newId = `convo-imported-${Date.now()}-${index}`;
+                        state.conversations[newId] = {
+                            ...convo,
+                            id: newId,
+                            timestamp: Date.now() + index
+                        };
+                        lastImportedId = newId;
+                        importedCount++;
                     }
+                });
 
-                    let importedCount = 0;
-                    let lastImportedId = null;
-
-                    data.data.forEach((convo, index) => {
-                        if (convo.id && convo.title && Array.isArray(convo.messages)) {
-                            const newId = `convo-imported-${Date.now()}-${index}`;
-                            state.conversations[newId] = {
-                                ...convo,
-                                id: newId,
-                                timestamp: Date.now() + index
-                            };
-                            lastImportedId = newId;
-                            importedCount++;
-                        }
-                    });
-
-                    if (importedCount === 0) {
-                        throw new Error("No valid conversations found in the file.");
-                    }
-
-                    saveStateToDB();
-                    renderConversationList();
-                    if (lastImportedId) {
-                        loadConversation(lastImportedId);
-                    }
-                    showConfirmModal("Import Successful", `${importedCount} conversation(s) imported successfully!`, () => {}, true);
-
-                } catch (error) {
-                    console.error("Failed to import chat:", error);
-                    showConfirmModal("Import Error", `Error importing file: ${error.message}`, () => {}, true);
-                } finally {
-                    dom.importFileInput.value = '';
+                if (importedCount === 0) {
+                    throw new Error("No valid conversations found in the file.");
                 }
-            };
-            reader.readAsText(file);
-        }
 
-        init();
-    });
-    </script>
-</body>
-</html>
+                saveStateToDB();
+                renderConversationList();
+                if (lastImportedId) {
+                    loadConversation(lastImportedId);
+                }
+                showConfirmModal("Import Successful", `${importedCount} conversation(s) imported successfully!`, () => {}, true);
+
+            } catch (error) {
+                console.error("Failed to import chat:", error);
+                showConfirmModal("Import Error", `Error importing file: ${error.message}`, () => {}, true);
+            } finally {
+                dom.importFileInput.value = '';
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+
+
+    init();
+});
+</script>
